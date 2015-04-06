@@ -6,7 +6,8 @@ public enum Polarization {
 	ANTISLASH,
 	SLASH;
 	
-	public static Polarization itopolar(int i) {
+	public static Polarization random() {
+		int i = (int)(Math.random()*4);
 		if(i==0)
 			return Polarization.HORIZONTAL;
 		if(i==1)

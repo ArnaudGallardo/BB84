@@ -1,22 +1,40 @@
+import java.io.UnsupportedEncodingException;
+
 
 public class Main {
-
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		//Tests.tests();
+		//Tests.mecha();
 		
-		//Etape 1 : Création d'un photon non polarisé
-		Photon photon = new Photon();
-		System.out.println("Photon départ : " + photon.toString());
+		//@SuppressWarnings("unused")
+		//Window fen = new Window();
 		
-		//Etape 2 : Polarisation du photon aléatoirement
-		photon.setPolarization(Polarization.itopolar((int)(Math.random()*4)));
-		System.out.println("Photon apres filtre : " + photon.toString());
+		char lettre = '1';
+		int ascii = (int) lettre;
+		System.out.println(lettre + " : "+ascii+" : "+Integer.toString(ascii,2));
+		Crypt.printBin(Crypt.toBin(lettre));
+		Crypt.printBin(Crypt.toBin("123"));
 		
-		//Etape 3 : Detection de la polarisation du photon (Bob)
-		Filter filter = new Filter(Basis.HORTOGONAL);
-		Polarization polarRes = filter.readPolarPhoton(photon);
-		System.out.println("Resultat lecture : " + polarRes);
-		System.out.println("Modification du photon : " + photon.toString());
+		byte[] test = Crypt.toBin(lettre);
+		for(int i=0;i<test.length;i++){
+			test[i]+=48;
+		}
+		try {
+			String testC = new String(test, "UTF-8");
+			int testI = Integer.parseInt(testC,2);
+			System.out.println(testI +" : "+ (char) testI);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Testing new one :");
+		String depart = "I'm groot !";
+		System.out.println("Depart : "+depart);
+		byte[] bytes = Crypt.toBin(depart);
+		Crypt.printBin(bytes);
+		String arrive = Crypt.toStr(bytes);
+		System.out.println("Arrive : "+ arrive);
 	}
 
 }

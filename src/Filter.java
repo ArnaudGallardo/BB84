@@ -14,6 +14,10 @@ public class Filter {
 		this.basis = basis;
 	}
 	
+	public String toString() {
+		return this.getBasis().toString();
+	}
+	
 	public Polarization readPolarPhoton(Photon photon) {
 		if(this.basis == Basis.HORTOGONAL) {
 			if(photon.getPolarization()==Polarization.VERTICAL || photon.getPolarization()==Polarization.HORIZONTAL) {
