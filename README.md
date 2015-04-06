@@ -7,3 +7,4 @@ Simulation of a BB84 Quantum Cryptography Protocol
   
 ## Notes
 
+Project archive to import in Eclipse is in the project_archive directory
