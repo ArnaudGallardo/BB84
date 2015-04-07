@@ -8,7 +8,7 @@ public class Main {
 		//Tests.mecha();
 		
 		//@SuppressWarnings("unused")
-		//Window fen = new Window();
+		Window fen = new Window();
 		
 		char lettre = '1';
 		int ascii = (int) lettre;
