@@ -15,12 +15,27 @@ public class Panel extends JPanel {
 	private int sizePhotonFlux = 0;
 	private int animPhotonFlux = 0;
 	
+	private int[] mailFlux = new int[10];
+	private int sizeMailFlux = 0;
+	private int animMailFlux = 0;
+	
+	private int[] dataFlux = new int[10];
+	private int sizeDataFlux = 0;
+	private int animDataFlux = 0;
+	
+	
 	public void paintComponent(Graphics g){
 		Image fiber = null;
 		Image p0 = null;
 		Image p1 = null;
 		Image p2 = null;
 		Image p3 = null;
+		Image mails = null;
+		Image m0 = null;
+		Image m1 = null;
+		Image data = null;
+		Image d0 = null;
+		Image d1 = null;
 		//Load images
 		try {
 			fiber = ImageIO.read(new File("img/fiber.png"));
@@ -28,6 +43,12 @@ public class Panel extends JPanel {
 			p1 = ImageIO.read(new File("img/horizontal.png"));
 			p2 = ImageIO.read(new File("img/slash.png"));
 			p3 = ImageIO.read(new File("img/antislash.png"));
+			mails = ImageIO.read(new File("img/mails.png"));
+			m0 = ImageIO.read(new File("img/m0.png"));
+			m1 = ImageIO.read(new File("img/m1.png"));
+			data = ImageIO.read(new File("img/data.png"));
+			d0 = ImageIO.read(new File("img/p0.png"));
+			d1 = ImageIO.read(new File("img/p1.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -47,9 +68,9 @@ public class Panel extends JPanel {
 	    //rgb(68,58,49)
 	    
 	    int height = this.getHeight()-100;
-		g.drawImage(fiber, (this.getWidth()-623)/2, ((height/3)/2)-(110/2)+menu_size, this);
+		g.drawImage(mails, (this.getWidth()-623)/2, ((height/3)/2)-(110/2)+menu_size, this);
 		g.drawImage(fiber, (this.getWidth()-623)/2, (height-110)/2+menu_size, this);
-		g.drawImage(fiber, (this.getWidth()-623)/2, ((height/3)/2)-(110/2)+(2*height/3)+menu_size, this);
+		g.drawImage(data, (this.getWidth()-623)/2, ((height/3)/2)-(110/2)+(2*height/3)+menu_size, this);
 		
 		//Draw animation photon
 		int x;
@@ -65,6 +86,26 @@ public class Panel extends JPanel {
 				g.drawImage(p2,x, y ,56,56, this);
 			else
 				g.drawImage(p3,x, y ,56,56, this);
+		}
+		//Draw anim mails
+		y = ((height/3)/2)-(110/2)+147;
+		for(int i=0;i<sizeMailFlux;i++) {
+			x=((this.getWidth()-600)/2)+60*(sizeMailFlux-i)-60;
+			x+=this.getAnimMailFlux();
+			if(mailFlux[i]==0)
+				g.drawImage(m0, x , y ,56,56, this);
+			else 
+				g.drawImage(m1,x, y ,56,56, this);
+		}
+		//Draw anim data
+		y = ((height/3)/2)-(110/2)+(2*height/3)+147;
+		for(int i=0;i<sizeDataFlux;i++) {
+			x=((this.getWidth()-600)/2)+60*(sizeDataFlux-i)-60;
+			x+=this.getAnimDataFlux();
+			if(dataFlux[i]==0)
+				g.drawImage(d0, x , y ,56,56, this);
+			else 
+				g.drawImage(d1,x, y ,56,56, this);
 		}
 	}   
 	
@@ -115,5 +156,96 @@ public class Panel extends JPanel {
 	
 	public void clearPhoton() {
 		setSizePhotonFlux(0);
+	}
+
+	
+	public void setMailFlux(int i, int v) {
+		this.mailFlux[i] = v;
+	}
+	
+	public int getMailFlux(int i) {
+		return this.mailFlux[i];
+	}
+	
+	public void setSizeMailFlux(int v) {
+		this.sizeMailFlux = v;
+	}
+	
+	public int getSizeMailFlux() {
+		return this.sizeMailFlux;
+	}
+	
+	public void setAnimMailFlux(int v) {
+		this.animMailFlux = v;
+	}
+	
+	public int getAnimMailFlux() {
+		return this.animMailFlux;
+	}
+	
+	public void addMail(byte b) {
+		System.out.println(this.getSizeMailFlux()+" | "+b);
+		
+		if(b==0)
+			this.setMailFlux(getSizeMailFlux(), 0);
+		else 
+			this.setMailFlux(getSizeMailFlux(), 1);
+		
+		if(getSizeMailFlux()>=9) {
+			for(int i=0;i<getSizeMailFlux();i++) {
+				this.setMailFlux(i, this.getMailFlux(i+1));
+			}
+		}
+		else
+			this.setSizeMailFlux(this.getSizeMailFlux()+1);
+	}
+	
+	public void clearMail() {
+		setSizeMailFlux(0);
+	}
+	
+	public void setDataFlux(int i, int v) {
+		this.dataFlux[i] = v;
+	}
+	
+	public int getDataFlux(int i) {
+		return this.dataFlux[i];
+	}
+	
+	public void setSizeDataFlux(int v) {
+		this.sizeDataFlux = v;
+	}
+	
+	public int getSizeDataFlux() {
+		return this.sizeDataFlux;
+	}
+	
+	public void setAnimDataFlux(int v) {
+		this.animDataFlux = v;
+	}
+	
+	public int getAnimDataFlux() {
+		return this.animDataFlux;
+	}
+	
+	public void addData(byte b) {
+		System.out.println(this.getSizeDataFlux()+" | "+b);
+		
+		if(b==0)
+			this.setDataFlux(getSizeDataFlux(), 0);
+		else 
+			this.setDataFlux(getSizeDataFlux(), 1);
+		
+		if(getSizeDataFlux()>=9) {
+			for(int i=0;i<getSizeDataFlux();i++) {
+				this.setDataFlux(i, this.getDataFlux(i+1));
+			}
+		}
+		else
+			this.setSizeDataFlux(this.getSizeDataFlux()+1);
+	}
+	
+	public void clearData() {
+		setSizeDataFlux(0);
 	}
 }
