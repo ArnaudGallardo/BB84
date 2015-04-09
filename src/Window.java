@@ -8,7 +8,7 @@ public class Window extends JFrame {
 
 	public Window(){             
 	    this.setTitle("BB84 Quantum Cryptography Simulator");
-	    this.setSize(800, 600);
+	    this.setSize(800, 700);
 	    this.setLocationRelativeTo(null);   
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
 	    //this.setExtendedState(JFrame.MAXIMIZED_BOTH); 
@@ -24,7 +24,13 @@ public class Window extends JFrame {
 			pan.addPhoton(rand);
 			pan.repaint();
 			try {
-				Thread.sleep(500);
+				//Animation
+				pan.setAnimPhotonFlux(0);
+				for(int a=0;a<60;a++) {
+					pan.setAnimPhotonFlux(pan.getAnimPhotonFlux()+1);
+					pan.repaint();
+					Thread.sleep(10);
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

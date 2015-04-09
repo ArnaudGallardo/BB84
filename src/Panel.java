@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.*;
@@ -12,6 +13,7 @@ public class Panel extends JPanel {
 	
 	private int[] photonFlux = new int[10];
 	private int sizePhotonFlux = 0;
+	private int animPhotonFlux = 0;
 	
 	public void paintComponent(Graphics g){
 		Image fiber = null;
@@ -19,7 +21,7 @@ public class Panel extends JPanel {
 		Image p1 = null;
 		Image p2 = null;
 		Image p3 = null;
-		//Background youpii
+		//Load images
 		try {
 			fiber = ImageIO.read(new File("img/fiber.png"));
 			p0 = ImageIO.read(new File("img/vertical.png"));
@@ -29,15 +31,32 @@ public class Panel extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//EFFACER
+		//Clear panel
 		g.setColor(Color.white);
 	    g.fillRect(0, 0, this.getWidth(), this.getHeight());
-	    //BACKGROUND
-		g.drawImage(fiber, (this.getWidth()-623)/2, (this.getHeight()-110)/2, this);
+	    //Draw Menu
+	    int menu_size = 100;
+	    g.setColor(new Color(0,158,224));
+	    g.fillRect(0, 0, this.getWidth(), menu_size);
+	    g.setColor(new Color(68,58,49));
+	    g.fillRect(0, menu_size-10, this.getWidth(), 10);
+	    Font font = new Font("Lato",Font.BOLD,20);
+	    g.setFont(font);
+	    g.drawString("BB84 Quantum Cryptography Protocol", 5, 25);
+	    
+	    //rgb(68,58,49)
+	    
+	    int height = this.getHeight()-100;
+		g.drawImage(fiber, (this.getWidth()-623)/2, ((height/3)/2)-(110/2)+menu_size, this);
+		g.drawImage(fiber, (this.getWidth()-623)/2, (height-110)/2+menu_size, this);
+		g.drawImage(fiber, (this.getWidth()-623)/2, ((height/3)/2)-(110/2)+(2*height/3)+menu_size, this);
+		
+		//Draw animation photon
 		int x;
-		int y = ((this.getHeight()-110)/2)+47;
+		int y = ((height-110)/2)+147;
 		for(int i=0;i<sizePhotonFlux;i++) {
-			x=((this.getWidth()-600)/2)+60*(sizePhotonFlux-i)-30;
+			x=((this.getWidth()-600)/2)+60*(sizePhotonFlux-i)-60;
+			x+=this.getAnimPhotonFlux();
 			if(photonFlux[i]==0)
 				g.drawImage(p0, x , y ,56,56, this);
 			else if(photonFlux[i]==1)
@@ -63,6 +82,14 @@ public class Panel extends JPanel {
 	
 	public int getSizePhotonFlux() {
 		return this.sizePhotonFlux;
+	}
+	
+	public void setAnimPhotonFlux(int v) {
+		this.animPhotonFlux = v;
+	}
+	
+	public int getAnimPhotonFlux() {
+		return this.animPhotonFlux;
 	}
 	
 	public void addPhoton(Photon p) {
