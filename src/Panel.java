@@ -14,14 +14,20 @@ public class Panel extends JPanel {
 	private int[] photonFlux = new int[10];
 	private int sizePhotonFlux = 0;
 	private int animPhotonFlux = 0;
+	private boolean directionPhotonFlux = true; //true = AtoB ; false = BtoA
 	
 	private int[] mailFlux = new int[10];
 	private int sizeMailFlux = 0;
 	private int animMailFlux = 0;
+	private boolean directionMailFlux = true;
 	
 	private int[] dataFlux = new int[10];
 	private int sizeDataFlux = 0;
 	private int animDataFlux = 0;
+	private boolean directionDataFlux = true;
+	
+	private boolean isCoAlice = false;
+	private boolean isCoBob = false;
 	
 	
 	public void paintComponent(Graphics g){
@@ -75,39 +81,110 @@ public class Panel extends JPanel {
 		//Draw animation photon
 		int x;
 		int y = ((height-110)/2)+147;
-		for(int i=0;i<sizePhotonFlux;i++) {
-			x=((this.getWidth()-600)/2)+60*(sizePhotonFlux-i)-60;
-			x+=this.getAnimPhotonFlux();
-			if(photonFlux[i]==0)
-				g.drawImage(p0, x , y ,56,56, this);
-			else if(photonFlux[i]==1)
-				g.drawImage(p1,x, y ,56,56, this);
-			else if(photonFlux[i]==2)
-				g.drawImage(p2,x, y ,56,56, this);
-			else
-				g.drawImage(p3,x, y ,56,56, this);
+		if(directionPhotonFlux) {
+			for(int i=0;i<sizePhotonFlux;i++) {
+				x=((this.getWidth()-600)/2)+60*(sizePhotonFlux-i)-60;
+				x+=this.getAnimPhotonFlux();
+				if(photonFlux[i]==0)
+					g.drawImage(p0, x , y ,56,56, this);
+				else if(photonFlux[i]==1)
+					g.drawImage(p1,x, y ,56,56, this);
+				else if(photonFlux[i]==2)
+					g.drawImage(p2,x, y ,56,56, this);
+				else
+					g.drawImage(p3,x, y ,56,56, this);
+			}
+		}
+		else {
+			for(int i=sizePhotonFlux-1;i>=0;i--) {
+				x=((this.getWidth()-600)/2)+60*(11-sizePhotonFlux+i)-60;
+				x-=this.getAnimPhotonFlux();
+				if(photonFlux[i]==0)
+					g.drawImage(p0, x , y ,56,56, this);
+				else if(photonFlux[i]==1)
+					g.drawImage(p1,x, y ,56,56, this);
+				else if(photonFlux[i]==2)
+					g.drawImage(p2,x, y ,56,56, this);
+				else
+					g.drawImage(p3,x, y ,56,56, this);
+			}
 		}
 		//Draw anim mails
 		y = ((height/3)/2)-(110/2)+147;
-		for(int i=0;i<sizeMailFlux;i++) {
-			x=((this.getWidth()-600)/2)+60*(sizeMailFlux-i)-60;
-			x+=this.getAnimMailFlux();
-			if(mailFlux[i]==0)
-				g.drawImage(m0, x , y ,56,56, this);
-			else 
-				g.drawImage(m1,x, y ,56,56, this);
+		if(directionMailFlux) {
+			for(int i=0;i<sizeMailFlux;i++) {
+				x=((this.getWidth()-600)/2)+60*(sizeMailFlux-i)-60;
+				x+=this.getAnimMailFlux();
+				if(mailFlux[i]==0)
+					g.drawImage(m0, x , y ,56,56, this);
+				else 
+					g.drawImage(m1,x, y ,56,56, this);
+			}
+		}
+		else {
+			for(int i=sizeMailFlux-1;i>=0;i--) {
+				x=((this.getWidth()-600)/2)+60*(11-sizeMailFlux+i)-60;
+				x-=this.getAnimMailFlux();
+				if(mailFlux[i]==0)
+					g.drawImage(m0, x , y ,56,56, this);
+				else 
+					g.drawImage(m1,x, y ,56,56, this);
+			}
 		}
 		//Draw anim data
 		y = ((height/3)/2)-(110/2)+(2*height/3)+147;
-		for(int i=0;i<sizeDataFlux;i++) {
-			x=((this.getWidth()-600)/2)+60*(sizeDataFlux-i)-60;
-			x+=this.getAnimDataFlux();
-			if(dataFlux[i]==0)
-				g.drawImage(d0, x , y ,56,56, this);
-			else 
-				g.drawImage(d1,x, y ,56,56, this);
+		if(directionDataFlux) {
+			for(int i=0;i<sizeDataFlux;i++) {
+				x=((this.getWidth()-600)/2)+60*(sizeDataFlux-i)-60;
+				x+=this.getAnimDataFlux();
+				if(dataFlux[i]==0)
+					g.drawImage(d0, x , y ,56,56, this);
+				else 
+					g.drawImage(d1,x, y ,56,56, this);
+			}
 		}
+		else {
+			for(int i=sizeDataFlux-1;i>=0;i--) {
+				x=((this.getWidth()-600)/2)+60*(11-sizeDataFlux+i)-60;
+				x-=this.getAnimDataFlux();
+				if(dataFlux[i]==0)
+					g.drawImage(d0, x , y ,56,56, this);
+				else 
+					g.drawImage(d1,x, y ,56,56, this);
+			}
+		}
+		
+		//Draw connected
+	    g.drawString("Alice", this.getWidth()-50, 25);
+	    g.drawString("Bob", this.getWidth()-50, 50);
+		if(isCoAlice)
+			g.setColor(Color.green);
+		else
+			g.setColor(Color.red);
+	    g.fillOval(this.getWidth()-70, 10, 15, 15);
+	    if(isCoBob)
+			g.setColor(Color.green);
+		else
+			g.setColor(Color.red);
+	    g.fillOval(this.getWidth()-70, 35, 15, 15);
+	    
 	}   
+	
+	public void setIsCoAlice(boolean b) {
+		isCoAlice = b;
+	}
+	
+	public void setIsCoBob(boolean b) {
+		isCoBob = b;
+	}
+	
+	public boolean getIsCoAlice() {
+		return isCoAlice;
+	}
+	
+	public boolean getIsCoBob() {
+		return isCoBob;
+	}
 	
 	public void setPhotonFlux(int i, int v) {
 		this.photonFlux[i] = v;
@@ -123,6 +200,14 @@ public class Panel extends JPanel {
 	
 	public int getSizePhotonFlux() {
 		return this.sizePhotonFlux;
+	}
+	
+	public void setDirectionPhotonFlux(boolean dir) {
+		this.directionPhotonFlux = dir;
+	}
+	
+	public boolean getDirectionPhotonFlux() {
+		return directionPhotonFlux;
 	}
 	
 	public void setAnimPhotonFlux(int v) {
@@ -175,6 +260,14 @@ public class Panel extends JPanel {
 		return this.sizeMailFlux;
 	}
 	
+	public void setDirectionMailFlux(boolean dir) {
+		this.directionMailFlux = dir;
+	}
+	
+	public boolean getDirectionMailFlux() {
+		return directionMailFlux;
+	}
+	
 	public void setAnimMailFlux(int v) {
 		this.animMailFlux = v;
 	}
@@ -183,10 +276,10 @@ public class Panel extends JPanel {
 		return this.animMailFlux;
 	}
 	
-	public void addMail(byte b) {
-		System.out.println(this.getSizeMailFlux()+" | "+b);
+	public void addMail(Filter f) {
+		System.out.println(this.getSizeMailFlux()+" | "+f);
 		
-		if(b==0)
+		if(f.getBasis()==Basis.DIAGONAL)
 			this.setMailFlux(getSizeMailFlux(), 0);
 		else 
 			this.setMailFlux(getSizeMailFlux(), 1);
@@ -218,6 +311,14 @@ public class Panel extends JPanel {
 	
 	public int getSizeDataFlux() {
 		return this.sizeDataFlux;
+	}
+	
+	public void setDirectionDataFlux(boolean dir) {
+		this.directionDataFlux = dir;
+	}
+	
+	public boolean getDirectionDataFlux() {
+		return directionDataFlux;
 	}
 	
 	public void setAnimDataFlux(int v) {

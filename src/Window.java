@@ -17,11 +17,9 @@ public class Window extends JFrame {
 	    start_anim();
 	}    
 	
-	private void start_anim() {
-		Photon rand = new Photon();
-		for(int i=0;i<13;i++) {
-			rand.setPolarization(Polarization.random());
-			pan.addPhoton(rand);
+	private void photonFluxAtoB(PhotonScheme ps) {
+		for(int i=0;i<ps.getSize();i++) {
+			pan.addPhoton(ps.getPhoton(i));
 			pan.repaint();
 			try {
 				//Animation
@@ -36,10 +34,17 @@ public class Window extends JFrame {
 			}
 		}
 		pan.clearPhoton();
-		byte b = 0;
-		for(int i=0;i<13;i++) {
-			b = (byte)(Math.random()*2);
-			pan.addMail(b);
+	}
+	
+	private void photonFluxBtoA(PhotonScheme ps) {
+		pan.setDirectionPhotonFlux(false);
+		photonFluxAtoB(ps);
+		pan.setDirectionPhotonFlux(true);
+	}
+		
+	private void mailFluxAtoB(FilterScheme fs) {
+		for(int i=0;i<fs.getSize();i++) {
+			pan.addMail(fs.getFilter(i));
 			pan.repaint();
 			try {
 				//Animation
@@ -54,10 +59,17 @@ public class Window extends JFrame {
 			}
 		}
 		pan.clearMail();
-		b = 0;
-		for(int i=0;i<13;i++) {
-			b = (byte)(Math.random()*2);
-			pan.addData(b);
+	}
+	
+	private void mailFluxBtoA(FilterScheme fs) {
+		pan.setDirectionMailFlux(false);
+		mailFluxAtoB(fs);
+		pan.setDirectionMailFlux(true);
+	}
+	
+	private void dataFluxAtoB(BytesScheme bs) {
+		for(int i=0;i<bs.getSize();i++) {
+			pan.addData(bs.getByte(i));
 			pan.repaint();
 			try {
 				//Animation
@@ -72,6 +84,24 @@ public class Window extends JFrame {
 			}
 		}
 		pan.clearData();
+	}
+	
+	private void dataFluxBtoA(BytesScheme bs) {
+		pan.setDirectionDataFlux(false);
+		dataFluxAtoB(bs);
+		pan.setDirectionDataFlux(true);
+	}
+	
+	private void start_anim() {
+		BytesScheme bs = new BytesScheme(6);
+		FilterScheme fs = new FilterScheme(6);
+		PhotonScheme ps = new PhotonScheme(6, bs, fs);
+		photonFluxAtoB(ps);
+		photonFluxBtoA(ps);
+		mailFluxAtoB(fs);
+		mailFluxBtoA(fs);
+		dataFluxAtoB(bs);
+		dataFluxBtoA(bs);
 		pan.repaint();
 	}
 }
