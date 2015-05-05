@@ -2,7 +2,7 @@ import javax.swing.JFrame;
 
 public class Window extends JFrame {
 
-	private Panel pan = new Panel();
+	private static Panel pan = new Panel();
 	
 	private static final long serialVersionUID = 1L;
 
@@ -17,7 +17,7 @@ public class Window extends JFrame {
 	    start_anim();
 	}    
 	
-	private void photonFluxAtoB(PhotonScheme ps) {
+	public static void photonFluxAtoB(PhotonScheme ps) {
 		for(int i=0;i<ps.getSize();i++) {
 			pan.addPhoton(ps.getPhoton(i));
 			pan.repaint();
@@ -36,13 +36,13 @@ public class Window extends JFrame {
 		pan.clearPhoton();
 	}
 	
-	private void photonFluxBtoA(PhotonScheme ps) {
+	public static void photonFluxBtoA(PhotonScheme ps) {
 		pan.setDirectionPhotonFlux(false);
 		photonFluxAtoB(ps);
 		pan.setDirectionPhotonFlux(true);
 	}
 		
-	private void mailFluxAtoB(FilterScheme fs) {
+	public static void mailFluxAtoB(FilterScheme fs) {
 		for(int i=0;i<fs.getSize();i++) {
 			pan.addMail(fs.getFilter(i));
 			pan.repaint();
@@ -61,13 +61,13 @@ public class Window extends JFrame {
 		pan.clearMail();
 	}
 	
-	private void mailFluxBtoA(FilterScheme fs) {
+	public static void mailFluxBtoA(FilterScheme fs) {
 		pan.setDirectionMailFlux(false);
 		mailFluxAtoB(fs);
 		pan.setDirectionMailFlux(true);
 	}
 	
-	private void dataFluxAtoB(BytesScheme bs) {
+	public static void dataFluxAtoB(BytesScheme bs) {
 		for(int i=0;i<bs.getSize();i++) {
 			pan.addData(bs.getByte(i));
 			pan.repaint();
@@ -86,14 +86,34 @@ public class Window extends JFrame {
 		pan.clearData();
 	}
 	
-	private void dataFluxBtoA(BytesScheme bs) {
+	public static void dataFluxBtoA(BytesScheme bs) {
 		pan.setDirectionDataFlux(false);
 		dataFluxAtoB(bs);
 		pan.setDirectionDataFlux(true);
 	}
 	
+	public static void connectAlice() {
+		pan.setIsCoAlice(true);
+		pan.repaint();
+	}
+	
+	public static void disconnectAlice() {
+		pan.setIsCoAlice(false);
+		pan.repaint();
+	}
+	
+	public static void connectBob() {
+		pan.setIsCoBob(true);
+		pan.repaint();
+	}
+	
+	public static void disconnectBob() {
+		pan.setIsCoBob(false);
+		pan.repaint();
+	}
+	
 	private void start_anim() {
-		BytesScheme bs = new BytesScheme(6);
+		/*BytesScheme bs = new BytesScheme(6);
 		FilterScheme fs = new FilterScheme(6);
 		PhotonScheme ps = new PhotonScheme(6, bs, fs);
 		photonFluxAtoB(ps);
@@ -102,6 +122,7 @@ public class Window extends JFrame {
 		mailFluxBtoA(fs);
 		dataFluxAtoB(bs);
 		dataFluxBtoA(bs);
+		pan.repaint();*/
 		pan.repaint();
 	}
 }

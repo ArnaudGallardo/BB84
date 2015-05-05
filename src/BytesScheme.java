@@ -28,6 +28,14 @@ public class BytesScheme extends AbstractScheme{
 		}
 	}
 	
+	public BytesScheme(byte[] b) {
+		super(b.length);
+		bytes = new byte[b.length];
+		for(int i=0;i<b.length;i++) {
+			bytes[i] = b[i];
+		}
+	}
+	
 	public BytesScheme(int size, PhotonScheme ph, FilterScheme po) {
 		super(size);
 		bytes = new byte[size];
