@@ -5,6 +5,10 @@ public class Photon {
 	public Photon() {
 		this.setPolarization(Polarization.NONE);
 	}
+	
+	public Photon(Polarization p) {
+		this.setPolarization(p);
+	}
 
 	public Polarization getPolarization() {
 		return polarization;
@@ -27,5 +31,15 @@ public class Photon {
 		else
 			tmp.append("Antislash polarized photon");
 		return tmp.toString();
-	}	
+	}
+	
+	public boolean equals(Photon p) {
+		if(this.getPolarization()==p.getPolarization())
+			return true;
+		return false;
+	}
+	
+	public Photon clone() {
+		return new Photon(this.getPolarization());
+	}
 }

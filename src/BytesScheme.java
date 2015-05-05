@@ -73,6 +73,34 @@ public class BytesScheme extends AbstractScheme{
 		return tmp.toString();
 	}
 	
+	public boolean eveDetected(BytesScheme bs,int[] index,int percentOfKey) {
+		int nbOfVerification = (percentOfKey*index.length)/100;
+		int[] checked = new int[nbOfVerification];
+		if(nbOfVerification<index.length) {
+			for(int i=0;i<nbOfVerification;i++) {
+				int random = (int)(Math.random()*index.length);
+				while(isInArray(random,checked)) {
+					random = (int)(Math.random()*index.length);
+				}
+				checked[i] = random;
+				int tmp = index[random];
+				index[random] = -1; //ATTENTION
+				if(this.getByte(tmp)!=bs.getByte(tmp))
+					return true;
+			}
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean isInArray(int i, int[] array) {
+		for(int j=0;j<array.length;j++) {
+			if (i==array[j])
+				return true;
+		}
+		return false;
+	}
+	
 	public BytesScheme getFinalKey(FilterScheme fs1, FilterScheme fs2) {
 		int[] indexTab = fs1.indexOfIden(fs2);
 		BytesScheme result = new BytesScheme(indexTab.length);

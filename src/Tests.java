@@ -38,7 +38,7 @@ public class Tests {
 
 		//Etape 1 : Création d'un photon non polarisé
 		Photon photon = new Photon();
-		System.out.println("Photon départ : " + photon.toString());
+		System.out.println("Photon d�part : " + photon.toString());
 		
 		//Etape 2 : Polarisation du photon aléatoirement
 		photon.setPolarization(Polarization.random());
@@ -98,5 +98,31 @@ public class Tests {
 		Crypt.printBin(bytes);
 		String arrive = Crypt.toStr(bytes);
 		System.out.println("Arrive : "+ arrive);
+	}
+	
+	public static void testEve() {
+		int size = 80;
+		BytesScheme aliceKey = new BytesScheme(size);
+		System.out.println(aliceKey);
+		FilterScheme aliceFilter = new FilterScheme(size);
+		System.out.println(aliceFilter);
+		PhotonScheme photonBeam = new PhotonScheme(size, aliceKey, aliceFilter);
+		
+		//Eve
+		Filter filtre = new Filter(Basis.random());
+		for(int i=0;i<size/2;i++) {
+			filtre = new Filter(Basis.random());
+			filtre.readPolarPhoton(photonBeam.getPhoton(i));
+		}
+		//Fin eve
+		
+		FilterScheme bobFilter = new FilterScheme(size);
+		System.out.println(bobFilter);
+		BytesScheme bobKey = new BytesScheme(size, photonBeam, bobFilter);
+		System.out.println(bobKey);
+		BytesScheme finalKey = bobKey.getFinalKey(aliceFilter, bobFilter);
+		System.out.println(finalKey);
+		boolean detected = bobKey.eveDetected(aliceKey, bobFilter.indexOfIden(aliceFilter), 20);
+		System.out.println(detected);
 	}
 }

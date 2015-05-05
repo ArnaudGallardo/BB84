@@ -50,8 +50,8 @@ public class Panel extends JPanel {
 			p2 = ImageIO.read(new File("img/slash.png"));
 			p3 = ImageIO.read(new File("img/antislash.png"));
 			mails = ImageIO.read(new File("img/mails.png"));
-			m0 = ImageIO.read(new File("img/m0.png"));
-			m1 = ImageIO.read(new File("img/m1.png"));
+			m0 = ImageIO.read(new File("img/mp.png"));
+			m1 = ImageIO.read(new File("img/mx.png"));
 			data = ImageIO.read(new File("img/data.png"));
 			d0 = ImageIO.read(new File("img/p0.png"));
 			d1 = ImageIO.read(new File("img/p1.png"));
@@ -279,7 +279,7 @@ public class Panel extends JPanel {
 	public void addMail(Filter f) {
 		System.out.println(this.getSizeMailFlux()+" | "+f);
 		
-		if(f.getBasis()==Basis.DIAGONAL)
+		if(f.getBasis()==Basis.HORTOGONAL)
 			this.setMailFlux(getSizeMailFlux(), 0);
 		else 
 			this.setMailFlux(getSizeMailFlux(), 1);

@@ -6,10 +6,10 @@ public class Main {
 		//Tests.mecha();
 		//Tests.crypt();
 		
-		@SuppressWarnings("unused")
-		Window fen = new Window();
-		
-		//Tests.crypt();
+		//@SuppressWarnings("unused")
+		//Window fen = new Window();
+		Benchmark.launch();
+		//Tests.testEve();
 	}
 
 }
