@@ -12,11 +12,12 @@ public class Main {
 		//Window fen = new Window();
 		//Benchmark.launch();
 		//Tests.testEve();
-		
-		Server server = new Server(new QuantumConnectionListener(), 15652, true);
+		QuantumConnectionListener qcl = new QuantumConnectionListener();
+		Server server = new Server(qcl, 15652, true);
 		server.startServer();
 		@SuppressWarnings("unused")
 		Window fen = new Window();
+		qcl.getSc().launchSystem();
 	}
 
 }
