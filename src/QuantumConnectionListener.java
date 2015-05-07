@@ -46,18 +46,21 @@ public class QuantumConnectionListener implements ConnectionListener{
 	public void clientConnected(ServerConnection conn){
 		if(!connected[0]) {
 			System.out.println("Alice Connected: "+conn.getIP());
+			conn.send(new String("ALICE").getBytes(), Delivery.RELIABLE);
 			connected[0]=true;
 			connectedIp[0]=conn.getIP();
 			Window.connectAlice();
 		}
 		else if(!connected[1]) {
 			System.out.println("Bob Connected: "+conn.getIP());
+			conn.send(new String("BOB").getBytes(), Delivery.RELIABLE);
 			connected[1]=true;
 			connectedIp[1]=conn.getIP();
 			Window.connectBob();
 		}
 		else if(!connected[2]) {
 			System.out.println("Eve Connected: "+conn.getIP());
+			conn.send(new String("EVE").getBytes(), Delivery.RELIABLE);
 			connected[2]=true;
 			connectedIp[2]=conn.getIP();
 			//Window.connectEve();
