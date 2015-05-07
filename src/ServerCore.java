@@ -8,7 +8,7 @@ public class ServerCore {
 	private ServerConnection[] connectedIp = new ServerConnection[3]; // Alice, Bob, Eve
 	private int peopleConnected = 0;
 	private String message = "";
-	private boolean spying = false;
+	private String spying = "";
 	
 	public ServerCore() {
 		
@@ -36,9 +36,26 @@ public class ServerCore {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("Waiting for a message...");
+			System.out.println("Waiting for a response...");
 		}
 		System.out.println("Message is : "+this.message);
+		
+		System.out.println("Ask Eve for spying :");
+		askForSpying(getConnectedIp(2),false);
+		
+		while(this.spying.equals("")) {
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Waiting for a response...");
+		}
+		System.out.println("Response is : "+this.spying); //y or n
+		
+		//CONTINUER ICI
+		//Besoin des réglages, puis scénario classique de cryptage + envoi des données
 		
 		
 	}
@@ -48,8 +65,10 @@ public class ServerCore {
 		conn.send(str.getBytes(), Delivery.RELIABLE);
 	}
 
-	public static void askForSpying(ServerConnection conn) {
+	public static void askForSpying(ServerConnection conn,boolean error) {
 		String str = new String("o"+"s"+"Do you want to spy (y/n) :");
+		if(error)
+			str = str + " Bad awnser, try again : ";
 		conn.send(str.getBytes(), Delivery.RELIABLE);
 	}
 
@@ -84,5 +103,12 @@ public class ServerCore {
 	
 	public void setMessage(String message) {
 		this.message = message;
+	}
+	
+	public void setSpying(String spying) {
+		if(spying.equals("y") || spying.equals("n"))
+			this.spying = spying;
+		else
+			askForSpying(getConnectedIp(2),true);
 	}
 }

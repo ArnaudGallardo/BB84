@@ -42,6 +42,8 @@ public class QuantumConnectionListener implements ConnectionListener{
     		String subtype = msg.substring(1,2);
     		if(subtype.equals("m"))
     			sc.setMessage(msg.substring(2));
+    		if(subtype.equals("s"))
+    			sc.setSpying(msg.substring(2));
     	}
     	
 		/*if(from.toString()==sc.getConnectedIp(0).getIP()) {
