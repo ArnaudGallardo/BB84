@@ -56,23 +56,95 @@ public class ServerCore {
 		
 		//CONTINUER ICI
 		//Besoin des r�glages, puis sc�nario classique de cryptage + envoi des donn�es
-		boolean spying = this.spying=="y";
-		
+		boolean isSpying = this.spying.equals("y");
+				
 		byte[] binMessage = Crypt.toBin(this.message);
 		
-		int oneTimePad = (int) Math.pow(2, binMessage.length);
+		//Si jamais, on utilise a nouveau 2^n
+		/*byte[][] binMessageTab = new byte[(binMessage.length/8)+1][8];
+		for(int i=0;i<(binMessage.length/8)+1;i++) {
+			for(int j=0;j<8;j++) {
+				if((i*8)+j<binMessage.length)
+					binMessageTab[i][j]=binMessage[(i*8)+j];
+			}
 		
+		}*/
+		//int oneTimePad = (int) Math.pow(2, binMessageTab[0].length);
+		
+		int oneTimePad = binMessage.length*2;
+		
+		//Alice
 		BytesScheme aliceKeyBin = new BytesScheme(oneTimePad);
 		FilterScheme aliceKeyFilt = new FilterScheme(oneTimePad);
 		PhotonScheme aliceKeyPhoton = new PhotonScheme(oneTimePad, aliceKeyBin, aliceKeyFilt);
+		sendMessage("Sending photons", connectedIp[0]);
+		Window.photonFluxAtoB(aliceKeyPhoton);
+		
+		//Eve
+		if(isSpying) {
+			sendMessage("You are spying the conversation !", connectedIp[2]);
+			FilterScheme eveHackFilter = new FilterScheme(oneTimePad);
+			@SuppressWarnings("unused")
+			BytesScheme eveHackBin = new BytesScheme(oneTimePad, aliceKeyPhoton, eveHackFilter);
+		}
+		
+		//Bob
+		sendMessage("Receiving data", connectedIp[1]);
+		FilterScheme bobKeyFilt = new FilterScheme(oneTimePad);
+		BytesScheme bobKeyBin = new BytesScheme(oneTimePad, aliceKeyPhoton, bobKeyFilt);
+		sendMessage("Sending filters", connectedIp[1]);
+		//Mails
+		Window.mailFluxBtoA(bobKeyFilt);
+		sendMessage("Receiving filters", connectedIp[0]);
+		
+		//BytesScheme eveFinalKey = eveHackBin.getFinalKey(aliceKeyFilt, eveHackFilter);
+		//Que faire d'Eve ??
+		int percentOfKey = 20; 
+		int[] indexId = bobKeyFilt.indexOfIden(aliceKeyFilt);
+		boolean detected = aliceKeyBin.eveDetected(bobKeyBin, indexId, percentOfKey);
+		
+		//Mettre en commun finalKey et detection
+		BytesScheme aliceFinalKey = aliceKeyBin.getFinalKey(aliceKeyFilt, bobKeyFilt);
 		
 		
+		if(!detected) {
+			sendMessage("Encrypting message...", connectedIp[0]);
+			byte[] cryptedMessage = Crypt.encrypt(binMessage, aliceFinalKey.cleanKeyWithIndex(indexId));
+			BytesScheme cryptedBS = new BytesScheme(cryptedMessage);
+			sendMessage("Sending crypted message...", connectedIp[0]);
+			Window.dataFluxAtoB(cryptedBS);
+			
+			sendMessage("Receiving message", connectedIp[1]);
+			byte[] decryptedMessage = Crypt.encrypt(cryptedMessage, aliceFinalKey.cleanKeyWithIndex(indexId));
+			String bobMessage =Crypt.toStr(decryptedMessage);
+			sendMessage("Message received and decrypted", connectedIp[1]);
+			sendMessage("Alice said : "+bobMessage, connectedIp[1]);
+			System.out.println(bobMessage);
+			sendMessage("Bob received the message", connectedIp[0]);
+		}
+		else {
+			sendAllMessage("Eve detected");
+			System.out.println("Detected!!");
+		}
 		
 		
-		
-		
+		this.message = "";
+		this.spying = "";
+		launchSystem();
 	}
 
+	private void sendMessage(String message, ServerConnection conn) {
+		String tmp = "i" + message;
+		conn.send(tmp.getBytes(), Delivery.RELIABLE);
+	}
+	
+	private void sendAllMessage(String message) {
+		String tmp = "i" + message;
+		for(int i=0;i<this.peopleConnected;i++) {
+			connectedIp[i].send(tmp.getBytes(), Delivery.RELIABLE);
+		}
+	}
+	
 	public static void askForMessage(ServerConnection conn) {
 		String str = new String("o"+"m"+"What is your message :");
 		conn.send(str.getBytes(), Delivery.RELIABLE);

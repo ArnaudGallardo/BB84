@@ -10,6 +10,29 @@ public class Tests {
 			System.out.println(tmp);
 		}
 	}
+	
+	public static void encrypt() {
+		char a = 'a';
+		byte[] aB = Crypt.toBin(a);
+		char b = 'b';
+		byte[] bB = Crypt.toBin(b);
+		
+		Crypt.printBin(aB);
+		Crypt.printBin(bB);
+		
+		byte[] en = Crypt.encrypt(aB, bB);
+		Crypt.printBin(en);
+		
+	}
+	
+	public static void bytesClean() {
+		BytesScheme bs = new BytesScheme(5);
+		int[] index = {0,1,2,-1,-1};
+		System.out.println(bs);
+		Crypt.printBin(bs.cleanKeyWithIndex(index));
+		
+	}
+	
 	public static void mecha() {
 		//On commence par créer une clé aléatoire de taille fixe
 				BytesScheme aliceBitSeq = new BytesScheme(TAILLE);

@@ -28,6 +28,7 @@ public class Panel extends JPanel {
 	
 	private boolean isCoAlice = false;
 	private boolean isCoBob = false;
+	private boolean isCoEve = false;
 	
 	
 	public void paintComponent(Graphics g){
@@ -155,18 +156,30 @@ public class Panel extends JPanel {
 		}
 		
 		//Draw connected
-	    g.drawString("Alice", this.getWidth()-50, 25);
-	    g.drawString("Bob", this.getWidth()-50, 50);
+	    g.drawString("Alice", 50, 75);
+	    g.drawString("Eve", (this.getWidth()/2)-25, 75);
+	    g.drawString("Bob", this.getWidth()-50, 75);
 		if(isCoAlice)
 			g.setColor(Color.green);
 		else
 			g.setColor(Color.red);
-	    g.fillOval(this.getWidth()-70, 10, 15, 15);
-	    if(isCoBob)
+		g.fillOval(25, 60, 15, 15);
+		if(isCoBob)
 			g.setColor(Color.green);
 		else
 			g.setColor(Color.red);
-	    g.fillOval(this.getWidth()-70, 35, 15, 15);
+	    g.fillOval(this.getWidth()-70, 60, 15, 15);
+	    if(isCoEve)
+			g.setColor(Color.green);
+		else
+			g.setColor(Color.red);
+	    g.fillOval((this.getWidth()/2)-45, 60, 15, 15);
+	    
+	    //Signature
+	    Font fontSign = new Font("Lato",Font.BOLD,15);
+	    g.setFont(fontSign);
+		g.setColor(Color.black);
+	    g.drawString("Arnaud-Marie GALLARDO     Candice Bentejac", 10, this.getHeight()-10);
 	    
 	}   
 	
@@ -184,6 +197,14 @@ public class Panel extends JPanel {
 	
 	public boolean getIsCoBob() {
 		return isCoBob;
+	}
+	
+	public void setIsCoEve(boolean b) {
+		isCoEve = b;
+	}
+	
+	public boolean getIsCoEve() {
+		return isCoEve;
 	}
 	
 	public void setPhotonFlux(int i, int v) {

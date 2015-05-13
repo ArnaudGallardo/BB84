@@ -12,14 +12,18 @@ public class Main {
 		//Window fen = new Window();
 		//Benchmark.launch();
 		//Tests.testEve();
-		Tests.random();
+		//Tests.random();
 		
-		//QuantumConnectionListener qcl = new QuantumConnectionListener();
-		//Server server = new Server(qcl, 15652, true);
-		//server.startServer();
-		//@SuppressWarnings("unused")
-		//Window fen = new Window();
-		//qcl.getSc().launchSystem();
+		//Tests.encrypt();
+		//Tests.bytesClean();
+		
+		
+		QuantumConnectionListener qcl = new QuantumConnectionListener();
+		Server server = new Server(qcl, 15652, true);
+		server.startServer();
+		@SuppressWarnings("unused")
+		Window fen = new Window();
+		qcl.getSc().launchSystem();
 	}
 
 }

@@ -65,4 +65,17 @@ public class Crypt {
 		}
 		System.out.println(tab[tab.length-1]+"]");
 	}
+	
+	public static byte[] encrypt(byte[] message, byte[] key) {
+		byte[] crypted = new byte[message.length];
+		int j=0;
+		for(int i=0;i<message.length;i++) {
+			if(j>=key.length)
+				j=0;
+			crypted[i] = (byte)(0xff & ((int)message[i]) ^ ((int)key[j]));
+			j++;
+		}
+		return crypted;
+	}
+	
 }

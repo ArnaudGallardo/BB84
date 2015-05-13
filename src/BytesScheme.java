@@ -52,6 +52,14 @@ public class BytesScheme extends AbstractScheme{
 		}
 	}
 
+	public byte[] getBytes() {
+		byte[] tmp = new byte[this.bytes.length];
+		for(int i=0;i<this.bytes.length;i++){
+			tmp[i]=this.bytes[i];
+		}
+		return tmp;
+	}
+	
 	public byte getByte(int i) {
 		return bytes[i];
 	}
@@ -88,7 +96,7 @@ public class BytesScheme extends AbstractScheme{
 		tmp.append(this.getByte(this.getSize()-1));
 		return tmp.toString();
 	}
-	
+	//A MODIFIER, bs == index donc ...
 	public boolean eveDetected(BytesScheme bs,int[] index,int percentOfKey) {
 		int nbOfVerification = (percentOfKey*index.length)/100;
 		int[] checked = new int[nbOfVerification];
@@ -107,6 +115,24 @@ public class BytesScheme extends AbstractScheme{
 			return false;
 		}
 		return true;
+	}
+	
+	public byte[] cleanKeyWithIndex(int[] index) {
+		int nb = 0;
+		for(int i=0;i<index.length;i++) {
+			if (index[i]==-1)
+				nb++;
+		}
+		byte[] result = new byte[this.getSize()-nb];
+		int tmp = 0;
+		for(int j=0;j<this.getSize();j++) {
+			if(index[j]!=-1) {
+				result[j-tmp] = this.getByte(j);
+			}
+			else
+				tmp++;
+		}
+		return result;
 	}
 	
 	private boolean isInArray(int i, int[] array) {

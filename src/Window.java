@@ -2,6 +2,8 @@ import javax.swing.JFrame;
 
 public class Window extends JFrame {
 
+	private static int WAIT = 2;
+	
 	private static Panel pan = new Panel();
 	
 	private static final long serialVersionUID = 1L;
@@ -27,7 +29,7 @@ public class Window extends JFrame {
 				for(int a=0;a<60;a++) {
 					pan.setAnimPhotonFlux(pan.getAnimPhotonFlux()+1);
 					pan.repaint();
-					Thread.sleep(10);
+					Thread.sleep(WAIT);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -52,7 +54,7 @@ public class Window extends JFrame {
 				for(int a=0;a<60;a++) {
 					pan.setAnimMailFlux(pan.getAnimMailFlux()+1);
 					pan.repaint();
-					Thread.sleep(10);
+					Thread.sleep(WAIT);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -77,7 +79,7 @@ public class Window extends JFrame {
 				for(int a=0;a<60;a++) {
 					pan.setAnimDataFlux(pan.getAnimDataFlux()+1);
 					pan.repaint();
-					Thread.sleep(10);
+					Thread.sleep(WAIT);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -109,6 +111,16 @@ public class Window extends JFrame {
 	
 	public static void disconnectBob() {
 		pan.setIsCoBob(false);
+		pan.repaint();
+	}
+	
+	public static void connectEve() {
+		pan.setIsCoEve(true);
+		pan.repaint();
+	}
+	
+	public static void disconnectEve() {
+		pan.setIsCoEve(false);
 		pan.repaint();
 	}
 	

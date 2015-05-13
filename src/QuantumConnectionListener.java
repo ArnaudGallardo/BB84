@@ -76,7 +76,7 @@ public class QuantumConnectionListener implements ConnectionListener{
 			conn.send(new String("EVE").getBytes(), Delivery.RELIABLE);
 			sc.setConnected(true,2);
 			sc.setConnectedIp(conn,2);
-			//Window.connectEve();
+			Window.connectEve();
 		}
 	}
 	
