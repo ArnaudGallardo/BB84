@@ -55,7 +55,20 @@ public class ServerCore {
 		System.out.println("Response is : "+this.spying); //y or n
 		
 		//CONTINUER ICI
-		//Besoin des réglages, puis scénario classique de cryptage + envoi des données
+		//Besoin des rï¿½glages, puis scï¿½nario classique de cryptage + envoi des donnï¿½es
+		boolean spying = this.spying=="y";
+		
+		byte[] binMessage = Crypt.toBin(this.message);
+		
+		int oneTimePad = (int) Math.pow(2, binMessage.length);
+		
+		BytesScheme aliceKeyBin = new BytesScheme(oneTimePad);
+		FilterScheme aliceKeyFilt = new FilterScheme(oneTimePad);
+		PhotonScheme aliceKeyPhoton = new PhotonScheme(oneTimePad, aliceKeyBin, aliceKeyFilt);
+		
+		
+		
+		
 		
 		
 	}

@@ -3,6 +3,13 @@ import java.io.UnsupportedEncodingException;
 
 public class Tests {
 	static int TAILLE = 10;
+	public static void random() {
+		byte tmp;
+		for(int i=0;i<20;i++) {
+			tmp = (byte)(Math.random()*2);
+			System.out.println(tmp);
+		}
+	}
 	public static void mecha() {
 		//On commence par créer une clé aléatoire de taille fixe
 				BytesScheme aliceBitSeq = new BytesScheme(TAILLE);
@@ -38,7 +45,7 @@ public class Tests {
 
 		//Etape 1 : Création d'un photon non polarisé
 		Photon photon = new Photon();
-		System.out.println("Photon d�part : " + photon.toString());
+		System.out.println("Photon d�part : " + photon.toString());
 		
 		//Etape 2 : Polarisation du photon aléatoirement
 		photon.setPolarization(Polarization.random());
