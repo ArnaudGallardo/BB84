@@ -6,6 +6,25 @@ import java.io.IOException;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 
+/*
+ * TODO: - Statistiques avec le chiffre de Vernam : on code 2^n photons, n étant le nombre de caractères du messages à crypter
+ * 		 	-> Un caractère est codé sur 8 octets : donc génération totale de photons = 2^(n*8)
+ * 		 - A la fin, le nombre de bits de la clé doit être égal au nombre de caractères du message
+ * 			-> La clé aura une longueur de n*8 bits
+ * 		 - On doit donc sacrifier k - n*8 bits, k étant la longueur de la clé obtenue à l'issue de la comparaison des filtres
+ * 
+ * Notes :
+ * 			1ère colonne : Nombre de qbits envoyés
+ * 			2ème colonne : Nombre de qbits correctement déchiffrés par Eve
+ * 			3ème colonne : Nombre de qbits correctement déchiffrés par Bob
+ * 			-> A insérer : Nombre de qbits de la clé après comparaison des filtres
+ * 			4ème colonne : Pourcentage de la clé connue par Eve
+ * 			5ème colonne : Pourcentage de qbits sacrifiés
+ * 			6ème colonne : Détection (ou pas) d'Eve
+ */			
+
+
+
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
@@ -15,7 +34,7 @@ public class Benchmark {
 		test(100,50,100,workbook);
 		try {
             FileOutputStream out = 
-                    new FileOutputStream(new File("C:\\Users\\Agila\\Documents\\poi-3.11\\MOI\\test1.xls"));
+                    new FileOutputStream(new File("C:\\Users\\Candice\\Documents\\testQuantique.xls"));
             workbook.write(out);
             workbook.close();
             out.close();
@@ -29,6 +48,7 @@ public class Benchmark {
         }
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static void test(int size_max, int percentOfVerification, int percentOfAttack, HSSFWorkbook workbook) {
 		StringBuffer name = new StringBuffer();
 		name.append("max=");
@@ -39,7 +59,7 @@ public class Benchmark {
 		name.append(percentOfAttack);
 		
 	    HSSFSheet sheet = workbook.createSheet(name.toString());
-	    
+	    /*
         //MOI
         int[] result;
         for(int i=0; i<size_max;i++) {
@@ -51,6 +71,46 @@ public class Benchmark {
         	}
         }
         //FIN MOI
+         */
+        
+        int[] result;
+        
+        // Style de cellules
+        HSSFCellStyle cellStyle = null; // Pour style des cellules
+        HSSFFont font = workbook.createFont(); // Création de la "police" pour pouvoir faire la mise en forme
+        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Mise en gras
+        cellStyle = workbook.createCellStyle(); // On initialise le style des cellules
+        cellStyle.setFont(font);
+        
+        Row firstLine = sheet.createRow(0);
+        
+        
+        String[] s = {"Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
+        		"Number of Qbits correctly read by Bob", "Part of the key Eve knows (in %)", 
+        		"Part of the key that is sacrificed (in %)", "Eve's detection"};
+        for(int i = 0; i < 6; i++)
+        {
+        	Cell cell = firstLine.createCell(i);   	
+        	cell.setCellValue(s[i]);
+            cell.setCellStyle(cellStyle);
+            sheet.autoSizeColumn(i);
+        }
+        
+        for(int i=1; i<=size_max;i++) {
+        	result = compute(48+i*8,percentOfVerification,percentOfAttack);
+            Row row = sheet.createRow(i);
+        	for(int j=0;j<result.length;j++) {
+        		Cell cell = row.createCell(j);
+                cell.setCellValue(result[j]);
+        	}
+        }
+        
+        // Pour Vernam
+        /* size_max = nombre max de caractères
+         * On part d'un minimum de 6 caractères
+         * 
+         */
+        
         System.out.println("Page done.");
 	}
 	
