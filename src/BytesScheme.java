@@ -17,6 +17,13 @@ public class BytesScheme extends AbstractScheme{
 			else
 				tmp = 1;
 		}
+		
+		// Errors induced by the noise in the fiber
+		int random = (int) (Math.random() * 100);
+		if (random < 3)
+		{
+			tmp = (byte) (Math.random() * 2);
+		}
 		return tmp;
 	}
 	
@@ -41,6 +48,7 @@ public class BytesScheme extends AbstractScheme{
 		bytes = new byte[size];
 		for(int i=0;i<size;i++) {
 			bytes[i]=unpolarize(ph.getPhoton(i), po.getFilter(i));
+			
 		}
 	}
 
