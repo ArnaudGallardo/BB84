@@ -10,7 +10,7 @@ public class Main {
 		
 		//@SuppressWarnings("unused")
 		//Window fen = new Window();
-		//Benchmark.launch();
+		Benchmark.launch();
 		//Tests.testEve();
 		//Tests.random();
 		
@@ -18,12 +18,12 @@ public class Main {
 		//Tests.bytesClean();
 		
 		
-		QuantumConnectionListener qcl = new QuantumConnectionListener();
+		/*QuantumConnectionListener qcl = new QuantumConnectionListener();
 		Server server = new Server(qcl, 15652, true);
 		server.startServer();
 		@SuppressWarnings("unused")
 		Window fen = new Window();
-		qcl.getSc().launchSystem();
+		qcl.getSc().launchSystem();*/
 	}
 
 }

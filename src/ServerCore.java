@@ -124,7 +124,7 @@ public class ServerCore {
 			sendMessage("Bob received the message", connectedIp[0]);
 		}
 		else {
-			sendAllMessage("Eve has been detected");
+			sendAllMessage("Eve has been detected!");
 			System.out.println("Detected!!");
 		}
 		
