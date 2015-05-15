@@ -179,7 +179,7 @@ public class Panel extends JPanel {
 	    Font fontSign = new Font("Lato",Font.BOLD,15);
 	    g.setFont(fontSign);
 		g.setColor(Color.black);
-	    g.drawString("Arnaud-Marie GALLARDO     Candice Bentejac", 10, this.getHeight()-10);
+	    g.drawString("Arnaud-Marie GALLARDO     Candice BENTEJAC", 10, this.getHeight()-10);
 	    
 	}   
 	
