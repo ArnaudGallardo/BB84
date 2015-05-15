@@ -18,6 +18,7 @@ public class ServerCore {
 		System.out.println("Waiting for Alice, Bob and Eve.");
 		int tmp = 0;
 		while(peopleConnected<3) {
+			//System.out.println(peopleConnected);
 			if(peopleConnected!=tmp) {
 				if(peopleConnected==1)
 					System.out.println("Waiting for Bob and Eve");
@@ -26,8 +27,8 @@ public class ServerCore {
 				tmp=peopleConnected;
 			}
 		}
-		System.out.println("Everyone connected !");
-		System.out.println("Ask Alice for message :");
+		System.out.println("Everyone is connected!");
+		System.out.println("Ask Alice for message:");
 		askForMessage(getConnectedIp(0));
 		while(this.message.equals("")) {
 			try {
@@ -38,9 +39,9 @@ public class ServerCore {
 			}
 			System.out.println("Waiting for a response...");
 		}
-		System.out.println("Message is : "+this.message);
+		System.out.println("Message is: "+this.message);
 		
-		System.out.println("Ask Eve for spying :");
+		System.out.println("Ask Eve for spying:");
 		askForSpying(getConnectedIp(2),false);
 		
 		while(this.spying.equals("")) {
@@ -52,7 +53,7 @@ public class ServerCore {
 			}
 			System.out.println("Waiting for a response...");
 		}
-		System.out.println("Response is : "+this.spying); //y or n
+		System.out.println("Response is: "+this.spying); //y or n
 		
 		//CONTINUER ICI
 		//Besoin des r�glages, puis sc�nario classique de cryptage + envoi des donn�es
@@ -82,14 +83,14 @@ public class ServerCore {
 		
 		//Eve
 		if(isSpying) {
-			sendMessage("You are spying the conversation !", connectedIp[2]);
+			sendMessage("You are spying on the conversation!", connectedIp[2]);
 			FilterScheme eveHackFilter = new FilterScheme(oneTimePad);
 			@SuppressWarnings("unused")
 			BytesScheme eveHackBin = new BytesScheme(oneTimePad, aliceKeyPhoton, eveHackFilter);
 		}
 		
 		//Bob
-		sendMessage("Receiving data", connectedIp[1]);
+		sendMessage("Receiving photons", connectedIp[1]);
 		FilterScheme bobKeyFilt = new FilterScheme(oneTimePad);
 		BytesScheme bobKeyBin = new BytesScheme(oneTimePad, aliceKeyPhoton, bobKeyFilt);
 		sendMessage("Sending filters", connectedIp[1]);
@@ -118,12 +119,12 @@ public class ServerCore {
 			byte[] decryptedMessage = Crypt.encrypt(cryptedMessage, aliceFinalKey.cleanKeyWithIndex(indexId));
 			String bobMessage =Crypt.toStr(decryptedMessage);
 			sendMessage("Message received and decrypted", connectedIp[1]);
-			sendMessage("Alice said : "+bobMessage, connectedIp[1]);
+			sendMessage("Alice said: "+bobMessage, connectedIp[1]);
 			System.out.println(bobMessage);
 			sendMessage("Bob received the message", connectedIp[0]);
 		}
 		else {
-			sendAllMessage("Eve detected");
+			sendAllMessage("Eve has been detected");
 			System.out.println("Detected!!");
 		}
 		
@@ -146,14 +147,14 @@ public class ServerCore {
 	}
 	
 	public static void askForMessage(ServerConnection conn) {
-		String str = new String("o"+"m"+"What is your message :");
+		String str = new String("o"+"m"+"What is your message:");
 		conn.send(str.getBytes(), Delivery.RELIABLE);
 	}
 
 	public static void askForSpying(ServerConnection conn,boolean error) {
-		String str = new String("o"+"s"+"Do you want to spy (y/n) :");
+		String str = new String("o"+"s"+"Do you want to spy (y/n):");
 		if(error)
-			str = str + " Bad awnser, try again : ";
+			str = str + " Wrong awnser, try again: ";
 		conn.send(str.getBytes(), Delivery.RELIABLE);
 	}
 
