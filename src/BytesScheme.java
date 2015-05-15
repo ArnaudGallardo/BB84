@@ -2,6 +2,8 @@
 public class BytesScheme extends AbstractScheme{
 	private byte[] bytes;
 	
+	private static int FIBER = 3; // Percentage of errors induced by the noise in optic fiber
+	
 	private static byte unpolarize(Photon p, Filter f) {
 		Polarization po = f.readPolarPhoton(p);
 		byte tmp;
@@ -20,7 +22,7 @@ public class BytesScheme extends AbstractScheme{
 		
 		// Errors induced by the noise in the fiber
 		int random = (int) (Math.random() * 100);
-		if (random < 3)
+		if (random < FIBER)
 		{
 			tmp = (byte) (Math.random() * 2);
 		}
