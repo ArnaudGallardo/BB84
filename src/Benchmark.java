@@ -3,22 +3,25 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 
 /*
- * TODO: - Statistiques avec le chiffre de Vernam : on code 2^n photons, n étant le nombre de caractères du messages à crypter
- * 		 	-> Un caractère est codé sur 8 octets : donc génération totale de photons = 2^(n*8)
- * 		 - A la fin, le nombre de bits de la clé doit être égal au nombre de caractères du message
- * 			-> La clé aura une longueur de n*8 bits
- * 		 - On doit donc sacrifier k - n*8 bits, k étant la longueur de la clé obtenue à l'issue de la comparaison des filtres
+ * TODO: - Statistiques avec le chiffre de Vernam : on code 2^n photons, n ï¿½tant le nombre de caractï¿½res du messages ï¿½ crypter
+ * 		 	-> Un caractï¿½re est codï¿½ sur 8 octets : donc gï¿½nï¿½ration totale de photons = 2^(n*8)
+ * 		 - A la fin, le nombre de bits de la clï¿½ doit ï¿½tre ï¿½gal au nombre de caractï¿½res du message
+ * 			-> La clï¿½ aura une longueur de n*8 bits
+ * 		 - On doit donc sacrifier k - n*8 bits, k ï¿½tant la longueur de la clï¿½ obtenue ï¿½ l'issue de la comparaison des filtres
  * 
  * Notes :
- * 			1ère colonne : Nombre de qbits envoyés
- * 			2ème colonne : Nombre de qbits correctement déchiffrés par Eve
- * 			3ème colonne : Nombre de qbits correctement déchiffrés par Bob
- * 			4ème colonne : Nombre de qbits sacrifiés
- * 			5ème colonne : Détection (ou pas) d'Eve
+ * 			1ï¿½re colonne : Nombre de qbits envoyï¿½s
+ * 			2ï¿½me colonne : Nombre de qbits correctement dï¿½chiffrï¿½s par Eve
+ * 			3ï¿½me colonne : Nombre de qbits correctement dï¿½chiffrï¿½s par Bob
+ * 			4ï¿½me colonne : Nombre de qbits sacrifiï¿½s
+ * 			5ï¿½me colonne : Dï¿½tection (ou pas) d'Eve
  */			
 
 
@@ -26,20 +29,50 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		write(3, workbook);
+		//write(3, workbook);
 		test(100,7,100,workbook);
 		test(100,13,100,workbook);
 		test(100,20,100,workbook);
 		test(100,50,100,workbook);
 		
 		try {
-            FileOutputStream out = 
-                    new FileOutputStream(new File("C:\\Users\\Candice\\Documents\\testQuantique.xls"));
-            workbook.write(out);
-            workbook.close();
-            out.close();
-            System.out.println("Excel written successfully..");
-            System.out.println("Closing.");
+			JFileChooser dialogue = new JFileChooser(new File("."));
+			File excelFile = null;
+			dialogue.setAcceptAllFileFilterUsed(false);
+			dialogue.addChoosableFileFilter(new FileFilter() {
+				
+				@Override
+				public String getDescription() {
+					return "Excel files (*.xls)";
+				}
+				
+				@Override
+				public boolean accept(File arg0) {
+					if(arg0.isDirectory()) {
+						return true;
+					} else {
+						return arg0.getName().toLowerCase().endsWith(".xls");
+					}
+				}
+			});
+			if (dialogue.showSaveDialog(null)== 
+				    JFileChooser.APPROVE_OPTION) {
+				    excelFile = dialogue.getSelectedFile();
+				    if (!excelFile.getName().toLowerCase().endsWith(".xls")) {
+				    	 excelFile = new File(excelFile.getAbsolutePath()+".xls");
+				    }
+		            //FileOutputStream out = 
+		                    //new FileOutputStream(new File("C:\\Users\\Candice\\Documents\\testQuantique.xls"));
+		            FileOutputStream out = 
+		                    new FileOutputStream(excelFile);
+		            workbook.write(out);
+		            workbook.close();
+		            out.close();
+		            System.out.println("Excel written successfully..");
+		            System.out.println("Closing.");
+			}
+			else
+				System.out.println("No file chosen !");
              
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -61,7 +94,7 @@ public class Benchmark {
         
         // Style de cellules
         HSSFCellStyle cellStyle = null; // Pour style des cellules
-        HSSFFont font = workbook.createFont(); // Création de la "police" pour pouvoir faire la mise en forme
+        HSSFFont font = workbook.createFont(); // Crï¿½ation de la "police" pour pouvoir faire la mise en forme
         font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Mise en gras
         cellStyle = workbook.createCellStyle(); // On initialise le style des cellules
         cellStyle.setFont(font);
@@ -120,7 +153,7 @@ public class Benchmark {
         
         // Style de cellules
         HSSFCellStyle cellStyle = null; // Pour style des cellules
-        HSSFFont font = workbook.createFont(); // Création de la "police" pour pouvoir faire la mise en forme
+        HSSFFont font = workbook.createFont(); // Crï¿½ation de la "police" pour pouvoir faire la mise en forme
         font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Mise en gras
         cellStyle = workbook.createCellStyle(); // On initialise le style des cellules
         cellStyle.setFont(font);
@@ -239,10 +272,10 @@ public class Benchmark {
 			while(isInArray(random,readByEve)) {
 				random = (int)(Math.random()*key_size);
 			}
-			photonAlice = psAlice.getPhoton(random).clone(); //On récupère (sans modifier) le photon
-			polarEve = filtersEve.getFilter(random).readPolarPhoton(psAlice.getPhoton(random)); //On récupère pour Eve (en Modifiant) le photon
+			photonAlice = psAlice.getPhoton(random).clone(); //On rï¿½cupï¿½re (sans modifier) le photon
+			polarEve = filtersEve.getFilter(random).readPolarPhoton(psAlice.getPhoton(random)); //On rï¿½cupï¿½re pour Eve (en Modifiant) le photon
 			photonEve.setPolarization(polarEve); //On simule un photon pour Eve
-			if(photonAlice.equals(photonEve)) { //On regarde si ils sont égaux
+			if(photonAlice.equals(photonEve)) { //On regarde si ils sont ï¿½gaux
 				indexGoodReadingOfEve[nb_correct_eve]=random;
 				nb_correct_eve++;
 			}
