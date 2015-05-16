@@ -29,7 +29,7 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		//write(3, workbook);
+		write(3, workbook);
 		test(100,7,100,workbook);
 		test(100,13,100,workbook);
 		test(100,20,100,workbook);
