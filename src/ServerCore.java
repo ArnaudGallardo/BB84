@@ -18,7 +18,7 @@ public class ServerCore {
 		System.out.println("Waiting for Alice, Bob and Eve.");
 		int tmp = 0;
 		while(peopleConnected<3) {
-			//System.out.println(peopleConnected);
+			System.out.println(peopleConnected);
 			if(peopleConnected!=tmp) {
 				if(peopleConnected==1)
 					System.out.println("Waiting for Bob and Eve");
