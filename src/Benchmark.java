@@ -123,6 +123,8 @@ public class Benchmark {
                 
         System.out.println("Page done.");
 	}
+	
+	
 
 	public static void test(int size_max, int percentOfVerification, int percentOfAttack, HSSFWorkbook workbook) {
 		StringBuffer name = new StringBuffer();
@@ -195,6 +197,60 @@ public class Benchmark {
 		//int qBitsEve = 0; // Initialization of the qBits number Eve reads properly
 		int oneTimePad = (int) Math.pow(2, keySizeMax*8); // Length = 2^(n*8) bytes (number of sent photons)
 		result[1] = oneTimePad; // Sent photons
+	
+		
+		/*
+		 * int size = (int) Math.pow(2, keySizeMax);
+		 * 
+		 * Creation of a BytesScheme array that will contain the byte scheme for the 2^n bits (n = number of character; 1n = 8bits)  
+		 * BytesScheme[] aliceKey = new BytesScheme[size];
+		 * 
+		 * Creation of a FilterScheme array that will contain the filter scheme for each sequence of 8 photons
+		 * FilterScheme [] aliceFilters = new FilterScheme[size];
+		 * 
+		 * Creation of a PhotonScheme array that will contain the photon scheme corresponding the sequences of 8 filters and bytes
+		 * PhotonScheme [] alicePhotons = new PhotonScheme[size];
+		 * 
+		 * for(int i = 0; i < size; i++)
+		 * {
+		 * 		aliceKey[i] = new BytesScheme(8); // The bytes scheme array is filled with bytes scheme of size 8
+		 * 		aliceFilters[i] = new FilterScheme(8); // The filters scheme array is filled with filters scheme of size 8
+		 * 		alicePhotons[i] = new PhotonScheme(8, aliceKey[i], aliceFilters[i]);
+		 * }
+		 * 
+		 *
+		 * Creation of a FilterScheme array that will contain Eve's filter schemes
+		 * FilterScheme[] eveFilters = new FilterScheme[size];
+		 * for(int i = 0; i < size; i++)
+		 * {
+		 * 		eveFilters[i] = new FilterScheme(8);
+		 * }
+		 * 
+		 * int numberIden = 0;
+		 * for(int i = 0; i < size; i++)
+		 * {
+		 * 		for(int j = 0; j < 8; j++)
+		 * 		{
+		 * 			if(eveFilters[i].getFilter(j) == aliceFilters[i].getFilter(j))
+		 * 				numberIden++;
+		 * 			eveFilters[i].getFilter(j).readPolarPhoton(alicePhotons[i].getPhoton(j));
+		 * 		}
+		 * }
+		 * 
+		 * result[2] = numberIden;
+		 * 
+		 * Creation of a FilterScheme array that will contain Bob's filters
+		 * FilterScheme[] bobFilters = new FilterScheme[size];
+		 * 
+		 * Creation of a BytesScheme array that will contain Bob's measurement with his own filters
+		 * BytesScheme[] bobKey = new BytesScheme[size];
+		 * 
+		 * for(int i = 0; i < size; i++)
+		 * {
+		 * 		bobFilters[i] = new FilterScheme(8);
+		 * 		bobKey[i] = new BytesScheme(8, alicePhotons[i], bobFilters[i]);
+		 * }
+		 */
 		
 		// Alice creates a chain of polarized photons
 		BytesScheme aliceKey = new BytesScheme(oneTimePad);
@@ -205,7 +261,7 @@ public class Benchmark {
 		FilterScheme eveFilters = new FilterScheme(oneTimePad);
 		int[] indexIden = aliceFilters.indexOfIden(eveFilters);
 		result[2] = indexIden.length; // Number of qBits correctly read by Eve
-		for(int i = 0; i < aliceFilters.getSize(); i++)
+		for(int i = 0; i < aliceFilters.getSize(); i++)	
 		{
 			eveFilters.getFilter(i).readPolarPhoton(alicePhotons.getPhoton(i));
 		}
