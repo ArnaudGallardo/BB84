@@ -11,21 +11,15 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 
 
-
-
-/*
- * TODO: - Statistiques avec le chiffre de Vernam : on code 2^n photons, n �tant le nombre de caract�res du messages � crypter
- * 		 	-> Un caract�re est cod� sur 8 octets : donc g�n�ration totale de photons = 2^(n*8)
- * 		 - A la fin, le nombre de bits de la cl� doit �tre �gal au nombre de caract�res du message
- * 			-> La cl� aura une longueur de n*8 bits
- * 		 - On doit donc sacrifier k - n*8 bits, k �tant la longueur de la cl� obtenue � l'issue de la comparaison des filtres
- * 
+/* 
  * Notes :
- * 			1�re colonne : Nombre de qbits envoy�s
- * 			2�me colonne : Nombre de qbits correctement d�chiffr�s par Eve
- * 			3�me colonne : Nombre de qbits correctement d�chiffr�s par Bob
- * 			4�me colonne : Nombre de qbits sacrifi�s
- * 			5�me colonne : D�tection (ou pas) d'Eve
+ * 			1st colum: Length of the original message
+ * 			2sd column: Number of qBits sent
+ * 			3rd column: Number of qBits correctly read by Eve
+ * 			4th column: Number of qBits correctly read by Bob
+ * 			5th column: Number of sacrificed qBits
+ * 			6th column: Eve detection
+ * 			
  */			
 
 
@@ -33,7 +27,7 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		write(3, workbook);
+		write(21, "2^n", workbook);
 		test(100,7,100,workbook);
 		test(100,13,100,workbook);
 		test(100,20,100,workbook);
@@ -86,11 +80,13 @@ public class Benchmark {
 	}
 	
 	
-	public static void write(int size_max, HSSFWorkbook workbook)
+	public static void write(int size_max, String lvl, HSSFWorkbook workbook)
 	{
 		StringBuffer name = new StringBuffer();
-		name.append("max characters=");
+		name.append("Max characters=");
 		name.append(size_max);
+		name.append(", security level=");
+		name.append(lvl);
 		
 		
 	    HSSFSheet sheet = workbook.createSheet(name.toString());
@@ -104,7 +100,6 @@ public class Benchmark {
         cellStyle.setFont(font);
         
         Row firstLine = sheet.createRow(0);
-        
         
         String[] s = {"Length of the message", "Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
         		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection"};
@@ -140,21 +135,7 @@ public class Benchmark {
 		name.append(percentOfAttack);
 		
 	    HSSFSheet sheet = workbook.createSheet(name.toString());
-	    
-	    /*
-        //MOI
-        int[] result;
-        for(int i=0; i<size_max;i++) {
-        	result = compute(48+i*8,percentOfVerification,percentOfAttack);
-            Row row = sheet.createRow(i);
-        	for(int j=0;j<result.length;j++) {
-        		Cell cell = row.createCell(j);
-                cell.setCellValue(result[j]);
-        	}
-        }
-        //FIN MOI
-        */
-        
+	          
         int[] result;
         
         // Style de cellules
