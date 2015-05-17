@@ -27,11 +27,15 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		write(21, "2^n", workbook);
-		test(100,7,100,workbook);
-		test(100,13,100,workbook);
-		test(100,20,100,workbook);
-		test(100,50,100,workbook);
+		write(100, 2, workbook);
+		write(100, 3, workbook);
+		write(100, 4, workbook);
+		write(100, 5, workbook);
+		write2n(21, workbook);
+//		test(100,7,100,workbook);
+//		test(100,13,100,workbook);
+//		test(100,20,100,workbook);
+//		test(100,50,100,workbook);
 		
 		try {
 			JFileChooser dialogue = new JFileChooser(new File("."));
@@ -80,14 +84,12 @@ public class Benchmark {
 	}
 	
 	
-	public static void write(int size_max, String lvl, HSSFWorkbook workbook)
+	public static void write2n(int size_max, HSSFWorkbook workbook)
 	{
 		StringBuffer name = new StringBuffer();
 		name.append("Max characters=");
 		name.append(size_max);
-		name.append(", security level=");
-		name.append(lvl);
-		
+		name.append(";security level=2^n");		
 		
 	    HSSFSheet sheet = workbook.createSheet(name.toString());
 	    int[] result;
@@ -111,10 +113,10 @@ public class Benchmark {
             sheet.autoSizeColumn(i);
         }
         
-        for(int i=1; i<=size_max;i++) {
+        for(int i = 1; i <= size_max; i++) {
         	result = computeVernam(i);
             Row row = sheet.createRow(i);
-        	for(int j=0;j<result.length;j++) {
+        	for(int j = 0; j < result.length; j++) {
         		Cell cell = row.createCell(j);
                 cell.setCellValue(result[j]);
         	}
@@ -123,34 +125,30 @@ public class Benchmark {
         System.out.println("Page done.");
 	}
 	
-	
-
-	public static void test(int size_max, int percentOfVerification, int percentOfAttack, HSSFWorkbook workbook) {
+	public static void write(int size_max, int lvl, HSSFWorkbook workbook)
+	{
 		StringBuffer name = new StringBuffer();
-		name.append("max=");
+		name.append("Max characters=");
 		name.append(size_max);
-		name.append(";percentVerif=");
-		name.append(percentOfVerification);
-		name.append("%;percentAttack=");
-		name.append(percentOfAttack);
+		name.append(";security=");
+		name.append(lvl);
+		name.append("n");
+		
 		
 	    HSSFSheet sheet = workbook.createSheet(name.toString());
-	          
-        int[] result;
+	    int[] result;
         
-        // Style de cellules
-        HSSFCellStyle cellStyle = null; // Pour style des cellules
-        HSSFFont font = workbook.createFont(); // Cr�ation de la "police" pour pouvoir faire la mise en forme
-        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Mise en gras
-        cellStyle = workbook.createCellStyle(); // On initialise le style des cellules
-        cellStyle.setFont(font);
+        // Cell style
+        HSSFCellStyle cellStyle = null; // Initialization of cell style
+        HSSFFont font = workbook.createFont(); // Creation of the font (to modify its appearence later)
+        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Bold
+        cellStyle = workbook.createCellStyle(); // Creation of the cell style
+        cellStyle.setFont(font); // Application of the cell style
         
         Row firstLine = sheet.createRow(0);
         
-        
-        String[] s = {"Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
-        		"Number of Qbits correctly read by Bob", "Part of the key known by Eve", 
-        		"Part of sacrificed photons", "Eve's detection"};
+        String[] s = {"Length of the message", "Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
+        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection"};
         for(int i = 0; i < 6; i++)
         {
         	Cell cell = firstLine.createCell(i);   	
@@ -159,10 +157,10 @@ public class Benchmark {
             sheet.autoSizeColumn(i);
         }
         
-        for(int i=0; i<=size_max;i++) {
-        	result = compute(48+i*8, percentOfVerification, percentOfAttack);
-            Row row = sheet.createRow(i+1);
-        	for(int j=0;j<result.length;j++) {
+        for(int i = 1; i <= size_max; i++) {
+        	result = compute(i, lvl);
+            Row row = sheet.createRow(i);
+        	for(int j = 0; j < result.length; j++) {
         		Cell cell = row.createCell(j);
                 cell.setCellValue(result[j]);
         	}
@@ -170,6 +168,123 @@ public class Benchmark {
                 
         System.out.println("Page done.");
 	}
+	
+	public static int[] compute(int keySizeMax, int lvl)
+	{
+		int result[] = new int[6];
+		result[0] = keySizeMax; // Number of characters we want to encrypt
+		
+		
+		int oneTimePad = keySizeMax * 8 * lvl;
+		result[1] = oneTimePad; // Number of photons that will be send
+		
+		// Creation of the key, filter scheme and photon scheme associated with Alice
+		BytesScheme aliceKey = new BytesScheme(oneTimePad);
+		FilterScheme aliceFilters = new FilterScheme(oneTimePad);
+		PhotonScheme alicePhotons = new PhotonScheme(oneTimePad, aliceKey, aliceFilters);
+		
+		// Creation of Eve's filter scheme
+		FilterScheme eveFilters = new FilterScheme(oneTimePad);
+		result[2] = eveFilters.numberIden(aliceFilters); // Number of photons correctly read by Eve
+		
+		for(int i = 0; i < oneTimePad; i++)
+		{
+			eveFilters.getFilter(i).readPolarPhoton(alicePhotons.getPhoton(i)); // Changes photons' polarization when needed
+		}
+		
+		// Creation of Bob's key and filter scheme
+		FilterScheme bobFilters = new FilterScheme(oneTimePad);
+		BytesScheme bobKey = new BytesScheme(oneTimePad, alicePhotons, bobFilters);
+		result[3] = bobFilters.numberIden(aliceFilters); // Number of photons correctly read by Bob
+		
+		int nbSacrificed = result[3] - (keySizeMax * 8); // Number of photons to sacrifice to obtain a proper key
+		
+		if(nbSacrificed <= 0) // If there's not bit to sacrifice
+		{
+			result[4] = 0; // We don't
+			result[5] = 0; // Eve is not detected
+		}
+		else
+			result[4] = nbSacrificed;
+
+		if(nbSacrificed > 0)
+		{
+			boolean detected = false; // Is Eve detected?
+			int cpt = 0; // Counter of sacrificed photons
+		
+			int[] comparison = arrayWithDiscards(bobKey, aliceFilters, bobFilters);
+		
+			while(cpt <= nbSacrificed && !detected) // Loop stops when all the photons to sacrifice have been sacrificed or when Eve's detected
+			{
+				int i = (int) (Math.random() * oneTimePad);
+				while(comparison[i] == -1)
+				{
+					i = (int) (Math.random() * oneTimePad);
+				}
+			
+				if(comparison[i] == aliceKey.getByte(i))
+				{
+					cpt++;
+					comparison[i] = -1;
+				}
+				else
+					detected = true;
+			}
+		
+			if(detected)
+				result[5] = 1;
+			else
+				result[5] = 0;
+		}
+		
+		return result;
+	}
+
+//	public static void test(int size_max, int percentOfVerification, int percentOfAttack, HSSFWorkbook workbook) {
+//		StringBuffer name = new StringBuffer();
+//		name.append("max=");
+//		name.append(size_max);
+//		name.append(";percentVerif=");
+//		name.append(percentOfVerification);
+//		name.append("%;percentAttack=");
+//		name.append(percentOfAttack);
+//		
+//	    HSSFSheet sheet = workbook.createSheet(name.toString());
+//	          
+//        int[] result;
+//        
+//        // Style de cellules
+//        HSSFCellStyle cellStyle = null; // Pour style des cellules
+//        HSSFFont font = workbook.createFont(); // Cr�ation de la "police" pour pouvoir faire la mise en forme
+//        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Mise en gras
+//        cellStyle = workbook.createCellStyle(); // On initialise le style des cellules
+//        cellStyle.setFont(font);
+//        
+//        Row firstLine = sheet.createRow(0);
+//        
+//        
+//        String[] s = {"Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
+//        		"Number of Qbits correctly read by Bob", "Part of the key known by Eve", 
+//        		"Part of sacrificed photons", "Eve's detection"};
+//        for(int i = 0; i < 6; i++)
+//        {
+//        	Cell cell = firstLine.createCell(i);   	
+//        	cell.setCellValue(s[i]);
+//            cell.setCellStyle(cellStyle);
+//            sheet.autoSizeColumn(i);
+//        }
+//        
+//        for(int i=0; i<=size_max;i++) {
+//        	result = compute(48+i*8, percentOfVerification, percentOfAttack);
+//            Row row = sheet.createRow(i+1);
+//        	for(int j=0;j<result.length;j++) {
+//        		Cell cell = row.createCell(j);
+//                cell.setCellValue(result[j]);
+//        	}
+//        }
+//                
+//        System.out.println("Page done.");
+//	}
 
 	
 	
@@ -182,9 +297,7 @@ public class Benchmark {
 		//int qBitsEve = 0; // Initialization of the qBits number Eve reads properly
 		int oneTimePad = (int) Math.pow(2, keySizeMax) * 8; // Length = 2^(n) * 8 bytes (number of sent photons)
 		result[1] = oneTimePad; // Sent photons
-	
-		
-		
+			
 		int size = (int) Math.pow(2, keySizeMax); // Size of the future arrays of schemes (which will be arrays of size 8 themselves)
 		
 		// Creation of a BytesScheme array that will contain the byte scheme for the 2^n bits (n = number of character; 1n = 8bits)  
@@ -212,10 +325,9 @@ public class Benchmark {
 		int numberIden = 0; // Number of filters that Eve chose properly
 		for(int i = 0; i < size; i++)
 		{
+			numberIden+= eveFilters[i].numberIden(aliceFilters[i]);
 			for(int j = 0; j < 8; j++)
 			{
-				if(eveFilters[i].getFilter(j).equals(aliceFilters[i].getFilter(j)))
-					numberIden++;
 				eveFilters[i].getFilter(j).readPolarPhoton(alicePhotons[i].getPhoton(j));
 			}
 		}
@@ -239,127 +351,121 @@ public class Benchmark {
 		// This array will later be used to determine if a photon has already been sacrificed or not
 		int[][] comparison = new int[size][8];
 		
-		
 		for(int i = 0; i < size; i++)
 		{
-			for(int j = 0; j < 8; j++)
-			{
-				if(bobFilters[i].getFilter(j).equals(aliceFilters[i].getFilter(j)))
-				{
-					if(bobKey[i].getByte(j) == 1)
-						comparison[i][j] = 1;
-					else
-						comparison[i][j] = 0;
-					numberIden++;
-				}
-				else
-					comparison[i][j] = -1;
-			}
+			numberIden+=bobFilters[i].numberIden(aliceFilters[i]);
+			comparison[i] = arrayWithDiscards(bobKey[i], bobFilters[i], aliceFilters[i]);
 		}
 		 
 		result[3] = numberIden;
 		
 		int nbSacrificed = numberIden - (keySizeMax * 8); // Number of photons that must be sacrificed to obtain a correct key
-		result[4] = nbSacrificed;
-		
-		boolean detected = false; // Is Eve detected?
-		
-		int cpt = 0; // Number of sacrificed photons
-		
-		
-		while(cpt <= nbSacrificed && !detected) // Loop stopped if Eve is detected OR if nbSacrificed photons have been discarded
+		if(nbSacrificed > 0)
+			result[4] = nbSacrificed;
+		else
 		{
-			int i = (int) (Math.random() * size);
-			int j = (int) (Math.random() * 8);
-			
-			while(comparison[i][j] == -1) // Checks if the coordinates correspond to a photon that has already been sacrificed
-										  // Or that has been discarded after the check of filters
-			{
-				i = (int) (Math.random() * size);
-				j = (int) (Math.random() * 8);
-			}
-			
-			if(aliceKey[i].getByte(j) == bobKey[i].getByte(j)) // The two bits are equal: good measurement
-			{
-				comparison[i][j] = -1;
-				cpt++;
-			}
-			else // The two bits are not equal: we suppose it is because of Eve who has tried to spy on us
-			{
-				detected = true;
-			}
+			result[4] = 0;
+			result[5] = 0;
 		}
 		
-		if(detected)
-			result[5] = 1;
-		else
-			result[5] = 0;
+		if(nbSacrificed > 0)
+		{
+			boolean detected = false; // Is Eve detected?
+			int cpt = 0; // Number of sacrificed photons
+				
+			while(cpt <= nbSacrificed && !detected) // Loop stopped if Eve is detected OR if nbSacrificed photons have been discarded
+			{
+				int i = (int) (Math.random() * size);
+				int j = (int) (Math.random() * 8);
+			
+				while(comparison[i][j] == -1) // Checks if the coordinates correspond to a photon that has already been sacrificed
+										  // Or that has been discarded after the check of filters
+				{
+					i = (int) (Math.random() * size);
+					j = (int) (Math.random() * 8);
+				}
+			
+				if(aliceKey[i].getByte(j) == bobKey[i].getByte(j)) // The two bits are equal: good measurement
+				{
+					comparison[i][j] = -1;
+					cpt++;
+				}
+				else // The two bits are not equal: we suppose it is because of Eve who has tried to spy on us
+				{
+					detected = true;
+				}
+			}
 		
+			if(detected)
+				result[5] = 1;
+			else
+				result[5] = 0;
+		}
 		return result;
 	}
 
 	
-	public static int[] compute(int key_size, int percentOfKey, int percentOfAttack) {
-		int[] result = new int[6];
-		
-		int nb_correct_eve = 0; // Number of filters that Eve chooses cor
-		FilterScheme filtersAlice = new FilterScheme(key_size);
-		BytesScheme bytesAlice = new BytesScheme(key_size);
-		PhotonScheme psAlice = new PhotonScheme(key_size, bytesAlice, filtersAlice);
-		Photon photonAlice = new Photon();
-		Photon photonEve = new Photon();
-		int[] indexGoodReadingOfEve = new int[key_size]; // Array that will contain the indexes of filters Eve chose properly
-		Polarization polarEve;
-		FilterScheme filtersEve = new FilterScheme(key_size); // Eve's filter scheme
-		int[] readByEve = new int[key_size]; // Array that will contain the indexes of the photons read by Eve
-		int nbToRead = percentOfAttack*key_size/100; // Percent of photons Eve will read
-		for(int i=0; i<nbToRead;i++) // For each photons Eve will read 
-		{  
-			int random = (int)(Math.random()*key_size); // Random index
-			
-			while(isInArray(random,readByEve)) // If the generated index corresponds to a photon that has already been read
-			{
-				random = (int)(Math.random()*key_size); // New index randomly generated
-			}
-			photonAlice = psAlice.getPhoton(random).clone(); // Catches Alice's photon without modifying it
-			polarEve = filtersEve.getFilter(random).readPolarPhoton(psAlice.getPhoton(random)); // Catches the polarization of Alice's photon and modifies it when necessary
-			photonEve.setPolarization(polarEve); // Simulates a photon for Eve
-			if(photonAlice.equals(photonEve)) // Checks if they are equal
-			{ 
-				indexGoodReadingOfEve[nb_correct_eve]=random; // Adds the index of the read photon in the array
-				nb_correct_eve++; // Increases the counter value
-			}
-		}
-		
-		FilterScheme filtersBob = new FilterScheme(key_size);
-		BytesScheme bytesBob = new BytesScheme(key_size, psAlice, filtersBob);
-		
-		// Creates an array containing the indexes of the identical filters used by both Alice and Bob
-		int[] goodsAliceBob = filtersBob.indexOfIden(filtersAlice);
-		
-		// Tests if Eve's detected
-		boolean eveDetected = bytesBob.eveDetected(bytesAlice, goodsAliceBob, percentOfKey);
-		int eveDetectedInt = 0;
-		if(eveDetected)
-			eveDetectedInt = 1;
-		result[5] = eveDetectedInt;
-		
-		// Creates an array containing the indexes of the identical filters used by both Eve and Bob
-		int[] goodsBobEve = filtersBob.indexOfIden(filtersEve); 
-		// Computes the number of measurements Eve can keep by comparing the arrays of identical filters indexes
-		int knownEve = compareArray(goodsAliceBob, goodsBobEve); 
-		
-		result[0] = key_size;
-		result[1] = nb_correct_eve;
-		result[2] = goodsAliceBob.length;
-		
-		double tmp = (knownEve*100)/goodsAliceBob.length; // Computes the part of the final key Eve knowss
-		result[3] = (int)tmp;
-		
-		tmp = (goodsAliceBob.length*100)/key_size; // Part of the key that has been sacrificed to detect Eve
-		result[4] = (int)tmp;
-		return result;
-	}
+//	public static int[] compute(int key_size, int percentOfKey, int percentOfAttack) {
+//		int[] result = new int[6];
+//		
+//		int nb_correct_eve = 0; // Number of filters that Eve chooses cor
+//		FilterScheme filtersAlice = new FilterScheme(key_size);
+//		BytesScheme bytesAlice = new BytesScheme(key_size);
+//		PhotonScheme psAlice = new PhotonScheme(key_size, bytesAlice, filtersAlice);
+//		Photon photonAlice = new Photon();
+//		Photon photonEve = new Photon();
+//		int[] indexGoodReadingOfEve = new int[key_size]; // Array that will contain the indexes of filters Eve chose properly
+//		Polarization polarEve;
+//		FilterScheme filtersEve = new FilterScheme(key_size); // Eve's filter scheme
+//		int[] readByEve = new int[key_size]; // Array that will contain the indexes of the photons read by Eve
+//		int nbToRead = percentOfAttack*key_size/100; // Percent of photons Eve will read
+//		for(int i=0; i<nbToRead;i++) // For each photons Eve will read 
+//		{  
+//			int random = (int)(Math.random()*key_size); // Random index
+//			
+//			while(isInArray(random,readByEve)) // If the generated index corresponds to a photon that has already been read
+//			{
+//				random = (int)(Math.random()*key_size); // New index randomly generated
+//			}
+//			photonAlice = psAlice.getPhoton(random).clone(); // Catches Alice's photon without modifying it
+//			polarEve = filtersEve.getFilter(random).readPolarPhoton(psAlice.getPhoton(random)); // Catches the polarization of Alice's photon and modifies it when necessary
+//			photonEve.setPolarization(polarEve); // Simulates a photon for Eve
+//			if(photonAlice.equals(photonEve)) // Checks if they are equal
+//			{ 
+//				indexGoodReadingOfEve[nb_correct_eve]=random; // Adds the index of the read photon in the array
+//				nb_correct_eve++; // Increases the counter value
+//			}
+//		}
+//		
+//		FilterScheme filtersBob = new FilterScheme(key_size);
+//		BytesScheme bytesBob = new BytesScheme(key_size, psAlice, filtersBob);
+//		
+//		// Creates an array containing the indexes of the identical filters used by both Alice and Bob
+//		int[] goodsAliceBob = filtersBob.indexOfIden(filtersAlice);
+//		
+//		// Tests if Eve's detected
+//		boolean eveDetected = bytesBob.eveDetected(bytesAlice, goodsAliceBob, percentOfKey);
+//		int eveDetectedInt = 0;
+//		if(eveDetected)
+//			eveDetectedInt = 1;
+//		result[5] = eveDetectedInt;
+//		
+//		// Creates an array containing the indexes of the identical filters used by both Eve and Bob
+//		int[] goodsBobEve = filtersBob.indexOfIden(filtersEve); 
+//		// Computes the number of measurements Eve can keep by comparing the arrays of identical filters indexes
+//		int knownEve = compareArray(goodsAliceBob, goodsBobEve); 
+//		
+//		result[0] = key_size;
+//		result[1] = nb_correct_eve;
+//		result[2] = goodsAliceBob.length;
+//		
+//		double tmp = (knownEve*100)/goodsAliceBob.length; // Computes the part of the final key Eve knowss
+//		result[3] = (int)tmp;
+//		
+//		tmp = (goodsAliceBob.length*100)/key_size; // Part of the key that has been sacrificed to detect Eve
+//		result[4] = (int)tmp;
+//		return result;
+//	}
 	
 	private static boolean isInArray(int i, int[] array) {
 		for(int j=0;j<array.length;j++) {
@@ -382,5 +488,23 @@ public class Benchmark {
 		}
 		return result;
 	}
-	
+
+	private static int[] arrayWithDiscards(BytesScheme bs, FilterScheme fs1, FilterScheme fs2)
+	{
+		assert(fs1.getSize() == fs2.getSize());
+		int result[] = new int[fs1.getSize()];
+		for(int i = 0; i < result.length; i++)
+		{
+			if(fs1.getFilter(i).equals(fs2.getFilter(i)))
+			{
+				if(bs.getByte(i) == 1)
+					result[i] = 1;
+				else
+					result[i] = 0;
+			}
+			else
+				result[i] = -1;
+		}
+		return result;
+	}
 }
