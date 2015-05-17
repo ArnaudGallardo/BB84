@@ -10,7 +10,7 @@ public class Main {
 		
 		//@SuppressWarnings("unused")
 		//Window fen = new Window();
-		Benchmark.launch();
+		//Benchmark.launch();
 		//Tests.testEve();
 		//Tests.random();
 		
