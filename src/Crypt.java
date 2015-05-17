@@ -2,6 +2,8 @@ import java.io.UnsupportedEncodingException;
 
 
 public class Crypt {
+	
+	// Converts a character into its binary equivalent
 	public static byte[] toBin(char c) {
 		byte[] tab = Integer.toString(c,2).getBytes();
 		for(int i=0;i<tab.length;i++){
@@ -10,6 +12,7 @@ public class Crypt {
 		return tab;
 	}
 	
+	// Converts a string of characters into its binary equivalent
 	public static byte[] toBin(String s) {
 		char[] cTab = s.toCharArray();
 		byte[] bTab = new byte[cTab.length * 8];
@@ -28,6 +31,7 @@ public class Crypt {
 		return bTab;
 	}
 	
+	// Converts an array of bytes into its characters string equivalent
 	public static String toStr(byte[] tab) {
 		StringBuffer tmp = new StringBuffer();
 		
@@ -58,6 +62,7 @@ public class Crypt {
 		return tmp.toString();
 	}
 	
+	// Prints an array of bytes
 	public static void printBin(byte[] tab) {
 		System.out.print("[");
 		for(int i=0;i<tab.length-1;i++) {
@@ -66,13 +71,14 @@ public class Crypt {
 		System.out.println(tab[tab.length-1]+"]");
 	}
 	
+	// Cyphers a binary message using a binary key and returns the crypted message into an array of bytes
 	public static byte[] encrypt(byte[] message, byte[] key) {
 		byte[] crypted = new byte[message.length];
 		int j=0;
 		for(int i=0;i<message.length;i++) {
 			if(j>=key.length)
 				j=0;
-			crypted[i] = (byte)(0xff & ((int)message[i]) ^ ((int)key[j]));
+			crypted[i] = (byte)(0xff & ((int)message[i]) ^ ((int)key[j])); // XOR
 			j++;
 		}
 		return crypted;
