@@ -10,7 +10,6 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 
-
 /* 
  * Notes :
  * 			1st colum: Length of the original message
@@ -19,10 +18,7 @@ import org.apache.poi.ss.usermodel.*;
  * 			4th column: Number of qBits correctly read by Bob
  * 			5th column: Number of sacrificed qBits
  * 			6th column: Eve detection
- * 			
- */			
-
-
+*/			
 
 public class Benchmark {
 	public static void launch() {
@@ -33,12 +29,7 @@ public class Benchmark {
 		write(100, 5, workbook);
 		write2n(21, workbook);
 		
-		
-//		test(100,7,100,workbook);
-//		test(100,13,100,workbook);
-//		test(100,20,100,workbook);
-//		test(100,50,100,workbook);
-		
+
 		try {
 			JFileChooser dialogue = new JFileChooser(new File("."));
 			File excelFile = null;
@@ -96,12 +87,12 @@ public class Benchmark {
 	    HSSFSheet sheet = workbook.createSheet(name.toString());
 	    int[] result;
         
-        // Style de cellules
-        HSSFCellStyle cellStyle = null; // Pour style des cellules
-        HSSFFont font = workbook.createFont(); // Cr�ation de la "police" pour pouvoir faire la mise en forme
-        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Mise en gras
-        cellStyle = workbook.createCellStyle(); // On initialise le style des cellules
-        cellStyle.setFont(font);
+	    // Cell style
+        HSSFCellStyle cellStyle = null; // Initialization of cell style
+        HSSFFont font = workbook.createFont(); // Creation of the font (to modify its appearence later)
+        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Bold
+        cellStyle = workbook.createCellStyle(); // Creation of the cell style
+        cellStyle.setFont(font); // Application of the cell style
         
         Row firstLine = sheet.createRow(0);
         
@@ -242,53 +233,7 @@ public class Benchmark {
 		return result;
 	}
 
-//	public static void test(int size_max, int percentOfVerification, int percentOfAttack, HSSFWorkbook workbook) {
-//		StringBuffer name = new StringBuffer();
-//		name.append("max=");
-//		name.append(size_max);
-//		name.append(";percentVerif=");
-//		name.append(percentOfVerification);
-//		name.append("%;percentAttack=");
-//		name.append(percentOfAttack);
-//		
-//	    HSSFSheet sheet = workbook.createSheet(name.toString());
-//	          
-//        int[] result;
-//        
-//        // Style de cellules
-//        HSSFCellStyle cellStyle = null; // Pour style des cellules
-//        HSSFFont font = workbook.createFont(); // Cr�ation de la "police" pour pouvoir faire la mise en forme
-//        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Mise en gras
-//        cellStyle = workbook.createCellStyle(); // On initialise le style des cellules
-//        cellStyle.setFont(font);
-//        
-//        Row firstLine = sheet.createRow(0);
-//        
-//        
-//        String[] s = {"Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
-//        		"Number of Qbits correctly read by Bob", "Part of the key known by Eve", 
-//        		"Part of sacrificed photons", "Eve's detection"};
-//        for(int i = 0; i < 6; i++)
-//        {
-//        	Cell cell = firstLine.createCell(i);   	
-//        	cell.setCellValue(s[i]);
-//            cell.setCellStyle(cellStyle);
-//            sheet.autoSizeColumn(i);
-//        }
-//        
-//        for(int i=0; i<=size_max;i++) {
-//        	result = compute(48+i*8, percentOfVerification, percentOfAttack);
-//            Row row = sheet.createRow(i+1);
-//        	for(int j=0;j<result.length;j++) {
-//        		Cell cell = row.createCell(j);
-//                cell.setCellValue(result[j]);
-//        	}
-//        }
-//                
-//        System.out.println("Page done.");
-//	}
 
-	
 	
 	// Make statistics using a message containing from 1*8 to keySizeMax*8 (1 characters = 8 bytes) characters with the creation of 2^n photons, n being the number of characters
 	public static int[] computeVernam(int keySizeMax)
@@ -407,68 +352,8 @@ public class Benchmark {
 	}
 
 	
-//	public static int[] compute(int key_size, int percentOfKey, int percentOfAttack) {
-//		int[] result = new int[6];
-//		
-//		int nb_correct_eve = 0; // Number of filters that Eve chooses cor
-//		FilterScheme filtersAlice = new FilterScheme(key_size);
-//		BytesScheme bytesAlice = new BytesScheme(key_size);
-//		PhotonScheme psAlice = new PhotonScheme(key_size, bytesAlice, filtersAlice);
-//		Photon photonAlice = new Photon();
-//		Photon photonEve = new Photon();
-//		int[] indexGoodReadingOfEve = new int[key_size]; // Array that will contain the indexes of filters Eve chose properly
-//		Polarization polarEve;
-//		FilterScheme filtersEve = new FilterScheme(key_size); // Eve's filter scheme
-//		int[] readByEve = new int[key_size]; // Array that will contain the indexes of the photons read by Eve
-//		int nbToRead = percentOfAttack*key_size/100; // Percent of photons Eve will read
-//		for(int i=0; i<nbToRead;i++) // For each photons Eve will read 
-//		{  
-//			int random = (int)(Math.random()*key_size); // Random index
-//			
-//			while(isInArray(random,readByEve)) // If the generated index corresponds to a photon that has already been read
-//			{
-//				random = (int)(Math.random()*key_size); // New index randomly generated
-//			}
-//			photonAlice = psAlice.getPhoton(random).clone(); // Catches Alice's photon without modifying it
-//			polarEve = filtersEve.getFilter(random).readPolarPhoton(psAlice.getPhoton(random)); // Catches the polarization of Alice's photon and modifies it when necessary
-//			photonEve.setPolarization(polarEve); // Simulates a photon for Eve
-//			if(photonAlice.equals(photonEve)) // Checks if they are equal
-//			{ 
-//				indexGoodReadingOfEve[nb_correct_eve]=random; // Adds the index of the read photon in the array
-//				nb_correct_eve++; // Increases the counter value
-//			}
-//		}
-//		
-//		FilterScheme filtersBob = new FilterScheme(key_size);
-//		BytesScheme bytesBob = new BytesScheme(key_size, psAlice, filtersBob);
-//		
-//		// Creates an array containing the indexes of the identical filters used by both Alice and Bob
-//		int[] goodsAliceBob = filtersBob.indexOfIden(filtersAlice);
-//		
-//		// Tests if Eve's detected
-//		boolean eveDetected = bytesBob.eveDetected(bytesAlice, goodsAliceBob, percentOfKey);
-//		int eveDetectedInt = 0;
-//		if(eveDetected)
-//			eveDetectedInt = 1;
-//		result[5] = eveDetectedInt;
-//		
-//		// Creates an array containing the indexes of the identical filters used by both Eve and Bob
-//		int[] goodsBobEve = filtersBob.indexOfIden(filtersEve); 
-//		// Computes the number of measurements Eve can keep by comparing the arrays of identical filters indexes
-//		int knownEve = compareArray(goodsAliceBob, goodsBobEve); 
-//		
-//		result[0] = key_size;
-//		result[1] = nb_correct_eve;
-//		result[2] = goodsAliceBob.length;
-//		
-//		double tmp = (knownEve*100)/goodsAliceBob.length; // Computes the part of the final key Eve knowss
-//		result[3] = (int)tmp;
-//		
-//		tmp = (goodsAliceBob.length*100)/key_size; // Part of the key that has been sacrificed to detect Eve
-//		result[4] = (int)tmp;
-//		return result;
-//	}
-	
+
+	// Returns true is the value i is contained in the array 
 	private static boolean isInArray(int i, int[] array) {
 		for(int j=0;j<array.length;j++) {
 			if (i==array[j])
@@ -477,6 +362,7 @@ public class Benchmark {
 		return false;
 	}
 	
+	// Returns the number of times where the value contained in a1 and a2 at the same index is equal
 	public static int compareArray(int[] a1, int[] a2) {
 		//MUST BE THE SAME SIZE!
 		int result=0;
@@ -491,6 +377,9 @@ public class Benchmark {
 		return result;
 	}
 
+	
+	// Returns an integer array containing Bob's bit measurements (0 or 1) at the indexes where Bob used the same filter as Alice
+	// Or -1 at the indexes where they didn't use the same filters
 	private static int[] arrayWithDiscards(BytesScheme bs, FilterScheme fs1, FilterScheme fs2)
 	{
 		assert(fs1.getSize() == fs2.getSize());
