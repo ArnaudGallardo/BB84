@@ -1,4 +1,5 @@
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,6 +9,9 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
+
+
+
 
 /*
  * TODO: - Statistiques avec le chiffre de Vernam : on code 2^n photons, n �tant le nombre de caract�res du messages � crypter
@@ -195,164 +199,183 @@ public class Benchmark {
 		result[0] = keySizeMax;
 		
 		//int qBitsEve = 0; // Initialization of the qBits number Eve reads properly
-		int oneTimePad = (int) Math.pow(2, keySizeMax*8); // Length = 2^(n*8) bytes (number of sent photons)
+		int oneTimePad = (int) Math.pow(2, keySizeMax) * 8; // Length = 2^(n) * 8 bytes (number of sent photons)
 		result[1] = oneTimePad; // Sent photons
 	
 		
-		/*
-		 * int size = (int) Math.pow(2, keySizeMax);
-		 * 
-		 * Creation of a BytesScheme array that will contain the byte scheme for the 2^n bits (n = number of character; 1n = 8bits)  
-		 * BytesScheme[] aliceKey = new BytesScheme[size];
-		 * 
-		 * Creation of a FilterScheme array that will contain the filter scheme for each sequence of 8 photons
-		 * FilterScheme [] aliceFilters = new FilterScheme[size];
-		 * 
-		 * Creation of a PhotonScheme array that will contain the photon scheme corresponding the sequences of 8 filters and bytes
-		 * PhotonScheme [] alicePhotons = new PhotonScheme[size];
-		 * 
-		 * for(int i = 0; i < size; i++)
-		 * {
-		 * 		aliceKey[i] = new BytesScheme(8); // The bytes scheme array is filled with bytes scheme of size 8
-		 * 		aliceFilters[i] = new FilterScheme(8); // The filters scheme array is filled with filters scheme of size 8
-		 * 		alicePhotons[i] = new PhotonScheme(8, aliceKey[i], aliceFilters[i]);
-		 * }
-		 * 
-		 *
-		 * Creation of a FilterScheme array that will contain Eve's filter schemes
-		 * FilterScheme[] eveFilters = new FilterScheme[size];
-		 * for(int i = 0; i < size; i++)
-		 * {
-		 * 		eveFilters[i] = new FilterScheme(8);
-		 * }
-		 * 
-		 * int numberIden = 0;
-		 * for(int i = 0; i < size; i++)
-		 * {
-		 * 		for(int j = 0; j < 8; j++)
-		 * 		{
-		 * 			if(eveFilters[i].getFilter(j) == aliceFilters[i].getFilter(j))
-		 * 				numberIden++;
-		 * 			eveFilters[i].getFilter(j).readPolarPhoton(alicePhotons[i].getPhoton(j));
-		 * 		}
-		 * }
-		 * 
-		 * result[2] = numberIden;
-		 * 
-		 * Creation of a FilterScheme array that will contain Bob's filters
-		 * FilterScheme[] bobFilters = new FilterScheme[size];
-		 * 
-		 * Creation of a BytesScheme array that will contain Bob's measurement with his own filters
-		 * BytesScheme[] bobKey = new BytesScheme[size];
-		 * 
-		 * for(int i = 0; i < size; i++)
-		 * {
-		 * 		bobFilters[i] = new FilterScheme(8);
-		 * 		bobKey[i] = new BytesScheme(8, alicePhotons[i], bobFilters[i]);
-		 * }
-		 */
 		
-		// Alice creates a chain of polarized photons
-		BytesScheme aliceKey = new BytesScheme(oneTimePad);
-		FilterScheme aliceFilters = new FilterScheme(oneTimePad);
-		PhotonScheme alicePhotons = new PhotonScheme(oneTimePad, aliceKey, aliceFilters);
+		int size = (int) Math.pow(2, keySizeMax); // Size of the future arrays of schemes (which will be arrays of size 8 themselves)
 		
-		// Eve uses a chain of filters to try to read the photons
-		FilterScheme eveFilters = new FilterScheme(oneTimePad);
-		int[] indexIden = aliceFilters.indexOfIden(eveFilters);
-		result[2] = indexIden.length; // Number of qBits correctly read by Eve
-		for(int i = 0; i < aliceFilters.getSize(); i++)	
+		// Creation of a BytesScheme array that will contain the byte scheme for the 2^n bits (n = number of character; 1n = 8bits)  
+		BytesScheme[] aliceKey = new BytesScheme[size];
+		 
+		// Creation of a FilterScheme array that will contain the filter scheme for each sequence of 8 photons
+		FilterScheme [] aliceFilters = new FilterScheme[size];
+		 
+		// Creation of a PhotonScheme array that will contain the photon scheme corresponding the sequences of 8 filters and bytes
+		PhotonScheme [] alicePhotons = new PhotonScheme[size];
+		for(int i = 0; i < size; i++)
 		{
-			eveFilters.getFilter(i).readPolarPhoton(alicePhotons.getPhoton(i));
+			aliceKey[i] = new BytesScheme(8); // The bytes scheme array is filled with bytes scheme of size 8
+		 	aliceFilters[i] = new FilterScheme(8); // The filters scheme array is filled with filters scheme of size 8
+		 	alicePhotons[i] = new PhotonScheme(8, aliceKey[i], aliceFilters[i]);
+		}
+
+		// Creation of a FilterScheme array that will contain Eve's filter schemes
+		FilterScheme[] eveFilters = new FilterScheme[size];
+		for(int i = 0; i < size; i++)
+		{
+			eveFilters[i] = new FilterScheme(8);
+		}
+		 
+		int numberIden = 0; // Number of filters that Eve chose properly
+		for(int i = 0; i < size; i++)
+		{
+			for(int j = 0; j < 8; j++)
+			{
+				if(eveFilters[i].getFilter(j).equals(aliceFilters[i].getFilter(j)))
+					numberIden++;
+				eveFilters[i].getFilter(j).readPolarPhoton(alicePhotons[i].getPhoton(j));
+			}
+		}
+		 
+		result[2] = numberIden;
+		 
+		// Creation of a FilterScheme array that will contain Bob's filters
+		FilterScheme[] bobFilters = new FilterScheme[size];
+		
+		// Creation of a BytesScheme array that will contain Bob's measurement with his own filters
+		BytesScheme[] bobKey = new BytesScheme[size];
+		for(int i = 0; i < size; i++)
+		{
+			bobFilters[i] = new FilterScheme(8);
+			bobKey[i] = new BytesScheme(8, alicePhotons[i], bobFilters[i]);
 		}
 		
+		numberIden = 0; // Number of filters Bob chose properly
 		
-		// Bob receives the photons chain and tries to read it
-		FilterScheme bobFilters = new FilterScheme(oneTimePad);
-		BytesScheme bobKey = new BytesScheme(oneTimePad, alicePhotons, bobFilters);
+		// Copy of Bob's key in an int array of dimension 2 to determine which bits measurement should be kept or not
+		// This array will later be used to determine if a photon has already been sacrificed or not
+		int[][] comparison = new int[size][8];
 		
-		// Verification of Bob's filters
-		indexIden = aliceFilters.indexOfIden(bobFilters); // Index of the identical filters
-		int length = indexIden.length; // Number of qBits correctly read by Bob
-		result[3] = length;
 		
-		int nbSacrificed = length - (keySizeMax*8);
-		result[4] = nbSacrificed; // Number of qBits to sacrifice 
-		
-		int cpt = 0; // Counter of the number of sacrificed photons
-		
-		int[] indexFinal = new int[length]; // Used to determine which bits have been sacrificed
-		
-		boolean detected = false; // Is Eve detected ? 
-		
-		while(cpt <= nbSacrificed && !detected)
+		for(int i = 0; i < size; i++)
 		{
-			int random = (int) (Math.random() * length); // Random index to sacrifice randomly a bit
-			while(indexFinal[random] == -1) // Checks we're not trying to sacrifice an already sacrificed bit
+			for(int j = 0; j < 8; j++)
 			{
-				random = (int) (Math.random() * length);
+				if(bobFilters[i].getFilter(j).equals(aliceFilters[i].getFilter(j)))
+				{
+					if(bobKey[i].getByte(j) == 1)
+						comparison[i][j] = 1;
+					else
+						comparison[i][j] = 0;
+					numberIden++;
+				}
+				else
+					comparison[i][j] = -1;
+			}
+		}
+		 
+		result[3] = numberIden;
+		
+		int nbSacrificed = numberIden - (keySizeMax * 8); // Number of photons that must be sacrificed to obtain a correct key
+		result[4] = nbSacrificed;
+		
+		boolean detected = false; // Is Eve detected?
+		
+		int cpt = 0; // Number of sacrificed photons
+		
+		
+		while(cpt <= nbSacrificed && !detected) // Loop stopped if Eve is detected OR if nbSacrificed photons have been discarded
+		{
+			int i = (int) (Math.random() * size);
+			int j = (int) (Math.random() * 8);
+			
+			while(comparison[i][j] == -1) // Checks if the coordinates correspond to a photon that has already been sacrificed
+										  // Or that has been discarded after the check of filters
+			{
+				i = (int) (Math.random() * size);
+				j = (int) (Math.random() * 8);
 			}
 			
-			if(aliceKey.getByte(indexIden[random]) == (bobKey.getByte(indexIden[random]))) // If the bit values are equals: nothing special
+			if(aliceKey[i].getByte(j) == bobKey[i].getByte(j)) // The two bits are equal: good measurement
 			{
+				comparison[i][j] = -1;
 				cpt++;
-				indexFinal[random] = -1;
 			}
-			else // Eve is detected (or there was an error due to the fiber's noise)
-				detected = true;			
+			else // The two bits are not equal: we suppose it is because of Eve who has tried to spy on us
+			{
+				detected = true;
+			}
 		}
 		
-		if(detected == true)
+		if(detected)
 			result[5] = 1;
 		else
 			result[5] = 0;
-	
+		
 		return result;
 	}
+
 	
 	public static int[] compute(int key_size, int percentOfKey, int percentOfAttack) {
 		int[] result = new int[6];
-		int nb_correct_eve = 0;
+		
+		int nb_correct_eve = 0; // Number of filters that Eve chooses cor
 		FilterScheme filtersAlice = new FilterScheme(key_size);
 		BytesScheme bytesAlice = new BytesScheme(key_size);
 		PhotonScheme psAlice = new PhotonScheme(key_size, bytesAlice, filtersAlice);
 		Photon photonAlice = new Photon();
 		Photon photonEve = new Photon();
-		int[] indexGoodReadingOfEve = new int[key_size];
+		int[] indexGoodReadingOfEve = new int[key_size]; // Array that will contain the indexes of filters Eve chose properly
 		Polarization polarEve;
-		FilterScheme filtersEve = new FilterScheme(key_size);
-		int[] readByEve = new int[key_size];
-		int nbToRead = percentOfAttack*key_size/100;
-		for(int i=0; i<nbToRead;i++) {  //Pour chaque photons
-			int random = (int)(Math.random()*key_size);
-			while(isInArray(random,readByEve)) {
-				random = (int)(Math.random()*key_size);
+		FilterScheme filtersEve = new FilterScheme(key_size); // Eve's filter scheme
+		int[] readByEve = new int[key_size]; // Array that will contain the indexes of the photons read by Eve
+		int nbToRead = percentOfAttack*key_size/100; // Percent of photons Eve will read
+		for(int i=0; i<nbToRead;i++) // For each photons Eve will read 
+		{  
+			int random = (int)(Math.random()*key_size); // Random index
+			
+			while(isInArray(random,readByEve)) // If the generated index corresponds to a photon that has already been read
+			{
+				random = (int)(Math.random()*key_size); // New index randomly generated
 			}
-			photonAlice = psAlice.getPhoton(random).clone(); //On r�cup�re (sans modifier) le photon
-			polarEve = filtersEve.getFilter(random).readPolarPhoton(psAlice.getPhoton(random)); //On r�cup�re pour Eve (en Modifiant) le photon
-			photonEve.setPolarization(polarEve); //On simule un photon pour Eve
-			if(photonAlice.equals(photonEve)) { //On regarde si ils sont �gaux
-				indexGoodReadingOfEve[nb_correct_eve]=random;
-				nb_correct_eve++;
+			photonAlice = psAlice.getPhoton(random).clone(); // Catches Alice's photon without modifying it
+			polarEve = filtersEve.getFilter(random).readPolarPhoton(psAlice.getPhoton(random)); // Catches the polarization of Alice's photon and modifies it when necessary
+			photonEve.setPolarization(polarEve); // Simulates a photon for Eve
+			if(photonAlice.equals(photonEve)) // Checks if they are equal
+			{ 
+				indexGoodReadingOfEve[nb_correct_eve]=random; // Adds the index of the read photon in the array
+				nb_correct_eve++; // Increases the counter value
 			}
 		}
 		
 		FilterScheme filtersBob = new FilterScheme(key_size);
 		BytesScheme bytesBob = new BytesScheme(key_size, psAlice, filtersBob);
+		
+		// Creates an array containing the indexes of the identical filters used by both Alice and Bob
 		int[] goodsAliceBob = filtersBob.indexOfIden(filtersAlice);
+		
+		// Tests if Eve's detected
 		boolean eveDetected = bytesBob.eveDetected(bytesAlice, goodsAliceBob, percentOfKey);
 		int eveDetectedInt = 0;
 		if(eveDetected)
 			eveDetectedInt = 1;
 		result[5] = eveDetectedInt;
-		int[] goodsBobEve = filtersBob.indexOfIden(filtersEve);
-		int knownEve = compareArray(goodsAliceBob, goodsBobEve);
+		
+		// Creates an array containing the indexes of the identical filters used by both Eve and Bob
+		int[] goodsBobEve = filtersBob.indexOfIden(filtersEve); 
+		// Computes the number of measurements Eve can keep by comparing the arrays of identical filters indexes
+		int knownEve = compareArray(goodsAliceBob, goodsBobEve); 
+		
 		result[0] = key_size;
 		result[1] = nb_correct_eve;
 		result[2] = goodsAliceBob.length;
-		double tmp = (knownEve*100)/goodsAliceBob.length;
+		
+		double tmp = (knownEve*100)/goodsAliceBob.length; // Computes the part of the final key Eve knowss
 		result[3] = (int)tmp;
-		tmp = (goodsAliceBob.length*100)/key_size;
+		
+		tmp = (goodsAliceBob.length*100)/key_size; // Part of the key that has been sacrificed to detect Eve
 		result[4] = (int)tmp;
 		return result;
 	}
@@ -378,4 +401,5 @@ public class Benchmark {
 		}
 		return result;
 	}
+	
 }
