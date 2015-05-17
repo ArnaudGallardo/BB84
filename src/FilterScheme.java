@@ -43,6 +43,7 @@ public class FilterScheme extends AbstractScheme{
 		return tmp.toString();
 	}
 	
+	// Returns an array of int containing the indexes of the filters that have been used by both Alice and Bob at the same time
 	public int[] indexOfIden(FilterScheme p) { //PB taille ?
 		int[] tmp = new int[p.getSize()];
 		int j = 0;
@@ -59,6 +60,8 @@ public class FilterScheme extends AbstractScheme{
 		return result;
 	}
 	
+	
+	// Returns the number of times when Alice and Bob used the same filter at the same time
 	public int numberIden(FilterScheme fp)
 	{
 		assert(this.getSize() == fp.getSize());
