@@ -152,7 +152,13 @@ public class Tests {
 		System.out.println(bobKey);
 		BytesScheme finalKey = bobKey.getFinalKey(aliceFilter, bobFilter);
 		System.out.println(finalKey);
-		boolean detected = bobKey.eveDetected(aliceKey, bobFilter.indexOfIden(aliceFilter), 20);
+		//boolean detected = bobKey.eveDetected(aliceKey, bobFilter.indexOfIden(aliceFilter), 20);
+		
+		// The third following lines replace the method eveDetected
+		int nbSacrificed = 20*size/100; // For the test, sacrificing of 20% of the key
+		int[] comparison = bobKey.arrayWithDiscards(aliceFilter, bobFilter);
+		boolean detected = aliceKey.detection(comparison, nbSacrificed);
+		
 		System.out.println(detected);
 	}
 }
