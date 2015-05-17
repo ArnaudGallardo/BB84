@@ -59,13 +59,13 @@ public class FilterScheme extends AbstractScheme{
 		return result;
 	}
 	
-	public int numberIden(FilterScheme fp1, FilterScheme fp2)
+	public int numberIden(FilterScheme fp)
 	{
-		assert(fp1.getSize() == fp2.getSize());
+		assert(this.getSize() == fp.getSize());
 		int nb = 0;
-		for(int i = 0; i < fp1.getSize(); i++)
+		for(int i = 0; i < fp.getSize(); i++)
 		{
-			if(fp1.getFilter(i).equals(fp2.getFilter(i)))
+			if(this.getFilter(i).equals(fp.getFilter(i)))
 				nb++;
 		}
 		return nb;
