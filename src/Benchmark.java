@@ -23,10 +23,10 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		write(100, 2, workbook);
-		write(100, 3, workbook);
-		write(100, 4, workbook);
-		write(100, 5, workbook);
+//		write(100, 2, workbook);
+//		write(100, 3, workbook);
+//		write(100, 4, workbook);
+//		write(100, 5, workbook);
 		write2n(21, workbook);
 		
 
@@ -200,35 +200,13 @@ public class Benchmark {
 		else
 			result[4] = nbSacrificed;
 
-		if(nbSacrificed > 0)
-		{
-			boolean detected = false; // Is Eve detected?
-			int cpt = 0; // Counter of sacrificed photons
+		int[] comparison = bobKey.arrayWithDiscards(aliceFilters, bobFilters); // Creation of an array containing Bob's bit measurement
+		// that Alice has validated, -1 otherwise
 		
-			int[] comparison = arrayWithDiscards(bobKey, aliceFilters, bobFilters);
-		
-			while(cpt <= nbSacrificed && !detected) // Loop stops when all the photons to sacrifice have been sacrificed or when Eve's detected
-			{
-				int i = (int) (Math.random() * oneTimePad);
-				while(comparison[i] == -1)
-				{
-					i = (int) (Math.random() * oneTimePad);
-				}
-			
-				if(comparison[i] == aliceKey.getByte(i))
-				{
-					cpt++;
-					comparison[i] = -1;
-				}
-				else
-					detected = true;
-			}
-		
-			if(detected)
-				result[5] = 1;
-			else
-				result[5] = 0;
-		}
+		if(aliceKey.detection(comparison, result[4]))
+			result[5] = 1;
+		else
+			result[5] = 0;
 		
 		return result;
 	}
@@ -301,12 +279,14 @@ public class Benchmark {
 		for(int i = 0; i < size; i++)
 		{
 			numberIden+=bobFilters[i].numberIden(aliceFilters[i]);
-			comparison[i] = arrayWithDiscards(bobKey[i], bobFilters[i], aliceFilters[i]);
+			comparison[i] = bobKey[i].arrayWithDiscards(bobFilters[i], aliceFilters[i]);
 		}
 		 
 		result[3] = numberIden;
 		
+		
 		int nbSacrificed = numberIden - (keySizeMax * 8); // Number of photons that must be sacrificed to obtain a correct key
+		
 		if(nbSacrificed > 0)
 			result[4] = nbSacrificed;
 		else
@@ -315,39 +295,20 @@ public class Benchmark {
 			result[5] = 0;
 		}
 		
-		if(nbSacrificed > 0)
+		boolean detected = false;
+		for(int i = 0; i < size; i++)
 		{
-			boolean detected = false; // Is Eve detected?
-			int cpt = 0; // Number of sacrificed photons
-				
-			while(cpt <= nbSacrificed && !detected) // Loop stopped if Eve is detected OR if nbSacrificed photons have been discarded
+			if(aliceKey[i].detection(comparison[i], nbSacrificed))
 			{
-				int i = (int) (Math.random() * size);
-				int j = (int) (Math.random() * 8);
-			
-				while(comparison[i][j] == -1) // Checks if the coordinates correspond to a photon that has already been sacrificed
-										  // Or that has been discarded after the check of filters
-				{
-					i = (int) (Math.random() * size);
-					j = (int) (Math.random() * 8);
-				}
-			
-				if(aliceKey[i].getByte(j) == bobKey[i].getByte(j)) // The two bits are equal: good measurement
-				{
-					comparison[i][j] = -1;
-					cpt++;
-				}
-				else // The two bits are not equal: we suppose it is because of Eve who has tried to spy on us
-				{
-					detected = true;
-				}
+				detected = true;
+				break;
 			}
-		
-			if(detected)
-				result[5] = 1;
-			else
-				result[5] = 0;
 		}
+
+		if(detected)
+			result[5] = 1;
+		else
+			result[5] = 0;
 		return result;
 	}
 
@@ -377,25 +338,4 @@ public class Benchmark {
 		return result;
 	}
 
-	
-	// Returns an integer array containing Bob's bit measurements (0 or 1) at the indexes where Bob used the same filter as Alice
-	// Or -1 at the indexes where they didn't use the same filters
-	private static int[] arrayWithDiscards(BytesScheme bs, FilterScheme fs1, FilterScheme fs2)
-	{
-		assert(fs1.getSize() == fs2.getSize());
-		int result[] = new int[fs1.getSize()];
-		for(int i = 0; i < result.length; i++)
-		{
-			if(fs1.getFilter(i).equals(fs2.getFilter(i)))
-			{
-				if(bs.getByte(i) == 1)
-					result[i] = 1;
-				else
-					result[i] = 0;
-			}
-			else
-				result[i] = -1;
-		}
-		return result;
-	}
 }
