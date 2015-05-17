@@ -100,9 +100,14 @@ public class ServerCore {
 		
 		//BytesScheme eveFinalKey = eveHackBin.getFinalKey(aliceKeyFilt, eveHackFilter);
 		//Que faire d'Eve ??
-		int percentOfKey = 20; 
+//		int percentOfKey = 20; 
 		int[] indexId = bobKeyFilt.indexOfIden(aliceKeyFilt);
-		boolean detected = aliceKeyBin.eveDetected(bobKeyBin, indexId, percentOfKey);
+//		boolean detected = aliceKeyBin.eveDetected(bobKeyBin, indexId, percentOfKey);
+		
+		// Les trois lignes ci-dessous permettent de remplacer la fonction eveDectected (supprime si tu trouves inutile :p)
+		int nbSacrificed = oneTimePad - binMessage.length;
+		int[] comparison = bobKeyBin.arrayWithDiscards(aliceKeyFilt, bobKeyFilt);
+		boolean detected = aliceKeyBin.detection(comparison, nbSacrificed);
 		
 		//Mettre en commun finalKey et detection
 		BytesScheme aliceFinalKey = aliceKeyBin.getFinalKey(aliceKeyFilt, bobKeyFilt);
