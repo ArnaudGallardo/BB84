@@ -25,6 +25,7 @@ public class Filter {
 		return false;
 	}
 	
+	// Returns the polarization of the read photon and changes it if read with the wrong filter
 	public Polarization readPolarPhoton(Photon photon) {
 		if(this.basis == Basis.HORTOGONAL) {
 			if(photon.getPolarization()==Polarization.VERTICAL || photon.getPolarization()==Polarization.HORIZONTAL) {
