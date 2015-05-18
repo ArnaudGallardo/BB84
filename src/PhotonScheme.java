@@ -5,13 +5,13 @@ public class PhotonScheme extends AbstractScheme{
 	private static Photon polarize(byte b, Filter f) {
 		Photon tmp = new Photon();
 		if(b==0) {
-			if(f.getBasis() == Basis.HORTOGONAL)
+			if(f.getBasis() == Basis.ORTHOGONAL)
 				tmp.setPolarization(Polarization.VERTICAL);
 			else
 				tmp.setPolarization(Polarization.SLASH);
 		}
 		else {
-			if(f.getBasis() == Basis.HORTOGONAL)
+			if(f.getBasis() == Basis.ORTHOGONAL)
 				tmp.setPolarization(Polarization.HORIZONTAL);
 			else
 				tmp.setPolarization(Polarization.ANTISLASH);

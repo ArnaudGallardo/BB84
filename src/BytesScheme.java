@@ -8,7 +8,7 @@ public class BytesScheme extends AbstractScheme{
 	private static byte unpolarize(Photon p, Filter f) {
 		Polarization po = f.readPolarPhoton(p);
 		byte tmp;
-		if(f.getBasis() == Basis.HORTOGONAL) {
+		if(f.getBasis() == Basis.ORTHOGONAL) {
 			if(po == Polarization.VERTICAL)
 				tmp = 0;
 			else

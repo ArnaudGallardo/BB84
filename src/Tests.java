@@ -75,7 +75,7 @@ public class Tests {
 		System.out.println("Photon apres filtre : " + photon.toString());
 		
 		//Etape 3 : Detection de la polarisation du photon (Bob)
-		Filter filter = new Filter(Basis.HORTOGONAL);
+		Filter filter = new Filter(Basis.ORTHOGONAL);
 		Polarization polarRes = filter.readPolarPhoton(photon);
 		System.out.println("Resultat lecture : " + polarRes);
 		System.out.println("Modification du photon : " + photon.toString());

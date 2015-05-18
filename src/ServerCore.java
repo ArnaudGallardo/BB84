@@ -97,7 +97,7 @@ public class ServerCore {
 		sendMessage("Sending filters list to Alice", connectedIp[1]);
 		//Mails
 		Window.mailFluxBtoA(bobKeyFilt);
-		sendMessage("Receiving filters list from Bob..", connectedIp[0]);
+		sendMessage("Receiving filters list from Bob...", connectedIp[0]);
 		
 		//BytesScheme eveFinalKey = eveHackBin.getFinalKey(aliceKeyFilt, eveHackFilter);
 		//Que faire d'Eve ??

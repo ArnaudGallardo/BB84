@@ -300,7 +300,7 @@ public class Panel extends JPanel {
 	public void addMail(Filter f) {
 		System.out.println(this.getSizeMailFlux()+" | "+f);
 		
-		if(f.getBasis()==Basis.HORTOGONAL)
+		if(f.getBasis()==Basis.ORTHOGONAL)
 			this.setMailFlux(getSizeMailFlux(), 0);
 		else 
 			this.setMailFlux(getSizeMailFlux(), 1);
