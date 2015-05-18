@@ -90,13 +90,14 @@ public class ServerCore {
 		}
 		
 		//Bob
-		sendMessage("Receiving photons", connectedIp[1]);
+		sendMessage("Receiving photons from Alice...", connectedIp[1]);
 		FilterScheme bobKeyFilt = new FilterScheme(oneTimePad);
+		sendMessage("Photons received", connectedIp[1]);
 		BytesScheme bobKeyBin = new BytesScheme(oneTimePad, aliceKeyPhoton, bobKeyFilt);
-		sendMessage("Sending filters", connectedIp[1]);
+		sendMessage("Sending filters list to Alice", connectedIp[1]);
 		//Mails
 		Window.mailFluxBtoA(bobKeyFilt);
-		sendMessage("Receiving filters", connectedIp[0]);
+		sendMessage("Receiving filters list from Bob..", connectedIp[0]);
 		
 		//BytesScheme eveFinalKey = eveHackBin.getFinalKey(aliceKeyFilt, eveHackFilter);
 		//Que faire d'Eve ??
@@ -117,10 +118,11 @@ public class ServerCore {
 			sendMessage("Encrypting message...", connectedIp[0]);
 			byte[] cryptedMessage = Crypt.encrypt(binMessage, aliceFinalKey.cleanKeyWithIndex(indexId));
 			BytesScheme cryptedBS = new BytesScheme(cryptedMessage);
-			sendMessage("Sending crypted message...", connectedIp[0]);
+			sendMessage("Encrypted", connectedIp[0]);
+			sendMessage("Sending crypted message to Bob...", connectedIp[0]);
 			Window.dataFluxAtoB(cryptedBS);
 			
-			sendMessage("Receiving message", connectedIp[1]);
+			sendMessage("Receiving crypted message from Alice...", connectedIp[1]);
 			byte[] decryptedMessage = Crypt.encrypt(cryptedMessage, aliceFinalKey.cleanKeyWithIndex(indexId));
 			String bobMessage =Crypt.toStr(decryptedMessage);
 			sendMessage("Message received and decrypted", connectedIp[1]);

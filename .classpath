@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="/home/arnaud/quantum/BB84/jars/poi-3.11-20141221.jar"/>
-	<classpathentry kind="lib" path="/home/arnaud/quantum/BB84/jars/Jexxus-1.42.jar"/>
+	<classpathentry kind="lib" path="/net/cremi/arngallardo/quantum/BB84/jars/poi-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="/net/cremi/arngallardo/git/BB84-client/jars/Jexxus-1.42.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
