@@ -11,6 +11,7 @@ public class Tests {
 		}
 	}
 	
+	// Cyphering test (from a character to an array of bytes)
 	public static void encrypt() {
 		char a = 'a';
 		byte[] aB = Crypt.toBin(a);
@@ -25,56 +26,57 @@ public class Tests {
 		
 	}
 	
+	
 	public static void bytesClean() {
 		BytesScheme bs = new BytesScheme(5);
 		int[] index = {0,1,2,-1,-1};
 		System.out.println(bs);
 		Crypt.printBin(bs.cleanKeyWithIndex(index));
-		
 	}
 	
 	public static void mecha() {
-		//On commence par créer une clé aléatoire de taille fixe
-				BytesScheme aliceBitSeq = new BytesScheme(TAILLE);
-				//On fabrique ensuite une séquence aléatoire de filtre polarisant
-				FilterScheme aliceFilterScheme = new FilterScheme(TAILLE);
-				//La création des photons polarisés se fait à l'aide des deux séquences précédente
-				PhotonScheme transmittedPhoton = new PhotonScheme(TAILLE, aliceBitSeq, aliceFilterScheme);
-				//On transmet ces photons
-				System.out.println(transmittedPhoton);
-				
-				//Eve essaye de voler les infos
-				FilterScheme eveFilterScheme = new FilterScheme(TAILLE);
-				//Il lit les photons qui arrivent
-				BytesScheme eveBitMeasurements = new BytesScheme(TAILLE, transmittedPhoton, eveFilterScheme);
-				System.out.println(eveBitMeasurements);
-				BytesScheme keyEve = eveBitMeasurements.getFinalKey(aliceFilterScheme, eveFilterScheme);
-				System.out.println("Eve : "+keyEve);
-				
-				
-				//Bob fabrique une séquence aléatoire de filtre polarisant
-				FilterScheme bobFilterScheme = new FilterScheme(TAILLE);
-				//Il lit les photons qui arrivent
-				BytesScheme bobBitMeasurements = new BytesScheme(TAILLE, transmittedPhoton, bobFilterScheme);
-				//Il envoi sa séquence de filtre et compare avec Alice pour avoir la clé
-				BytesScheme keyBob = bobBitMeasurements.getFinalKey(aliceFilterScheme, bobFilterScheme);
-				//Il possède maintenant une clé
-				System.out.println("Bob : "+keyBob);
-				//Alice fait pareil
-				BytesScheme keyAlice = aliceBitSeq.getFinalKey(bobFilterScheme, aliceFilterScheme);
-				System.out.println("Alice : "+keyAlice);
+		// Creation of a random key of fixed size
+		BytesScheme aliceBitSeq = new BytesScheme(TAILLE);
+		// Creation of a random scheme of polarizing filters
+		FilterScheme aliceFilterScheme = new FilterScheme(TAILLE);
+		// Creation of polarized photons thanks to both of the previous schemes
+		PhotonScheme transmittedPhoton = new PhotonScheme(TAILLE, aliceBitSeq, aliceFilterScheme);
+		// The photons are transmitted
+		System.out.println(transmittedPhoton);
+			
+		// Eve tries to spy on the conversation
+		FilterScheme eveFilterScheme = new FilterScheme(TAILLE);
+		// She read the incoming photons
+		BytesScheme eveBitMeasurements = new BytesScheme(TAILLE, transmittedPhoton, eveFilterScheme);
+		System.out.println(eveBitMeasurements);
+		BytesScheme keyEve = eveBitMeasurements.getFinalKey(aliceFilterScheme, eveFilterScheme);
+		System.out.println("Eve : "+keyEve);
+						
+		// Bob creates of random scheme of polarizing filters		
+		FilterScheme bobFilterScheme = new FilterScheme(TAILLE);
+		// He reads the incoming photons
+		BytesScheme bobBitMeasurements = new BytesScheme(TAILLE, transmittedPhoton, bobFilterScheme);
+		// He sends his filter scheme to Alice and compares it with her to obtain the key
+		BytesScheme keyBob = bobBitMeasurements.getFinalKey(aliceFilterScheme, bobFilterScheme);
+		// He has now a key
+		System.out.println("Bob : "+keyBob);
+		
+		// So does Alice
+		BytesScheme keyAlice = aliceBitSeq.getFinalKey(bobFilterScheme, aliceFilterScheme);
+		System.out.println("Alice : "+keyAlice);
 	}
+	
 	public static void tests() {
 
-		//Etape 1 : Création d'un photon non polarisé
+		// Step 1: Non-polarized photon creation
 		Photon photon = new Photon();
 		System.out.println("Photon d�part : " + photon.toString());
 		
-		//Etape 2 : Polarisation du photon aléatoirement
+		// Step 2: Random photon polarization 
 		photon.setPolarization(Polarization.random());
 		System.out.println("Photon apres filtre : " + photon.toString());
 		
-		//Etape 3 : Detection de la polarisation du photon (Bob)
+		// Step 3: Photon polarization detection (Bob)
 		Filter filter = new Filter(Basis.ORTHOGONAL);
 		Polarization polarRes = filter.readPolarPhoton(photon);
 		System.out.println("Resultat lecture : " + polarRes);
@@ -102,6 +104,7 @@ public class Tests {
 		System.out.println(ph);
 	}
 	
+	// Tests the conversion from string to bytes and the other way round
 	public static void crypt() {
 		char lettre = '1';
 		int ascii = (int) lettre;
@@ -130,6 +133,7 @@ public class Tests {
 		System.out.println("Arrive : "+ arrive);
 	}
 	
+	// Tests Eve's spying and detection
 	public static void testEve() {
 		int size = 80;
 		BytesScheme aliceKey = new BytesScheme(size);
@@ -138,13 +142,12 @@ public class Tests {
 		System.out.println(aliceFilter);
 		PhotonScheme photonBeam = new PhotonScheme(size, aliceKey, aliceFilter);
 		
-		//Eve
+		// Eve
 		Filter filtre = new Filter(Basis.random());
 		for(int i=0;i<size/2;i++) {
 			filtre = new Filter(Basis.random());
 			filtre.readPolarPhoton(photonBeam.getPhoton(i));
 		}
-		//Fin eve
 		
 		FilterScheme bobFilter = new FilterScheme(size);
 		System.out.println(bobFilter);
@@ -152,9 +155,7 @@ public class Tests {
 		System.out.println(bobKey);
 		BytesScheme finalKey = bobKey.getFinalKey(aliceFilter, bobFilter);
 		System.out.println(finalKey);
-		//boolean detected = bobKey.eveDetected(aliceKey, bobFilter.indexOfIden(aliceFilter), 20);
 		
-		// The third following lines replace the method eveDetected
 		int nbSacrificed = 20*size/100; // For the test, sacrificing of 20% of the key
 		int[] comparison = bobKey.arrayWithDiscards(aliceFilter, bobFilter);
 		boolean detected = aliceKey.detection(comparison, nbSacrificed);
