@@ -57,8 +57,6 @@ public class Benchmark {
 				    if (!excelFile.getName().toLowerCase().endsWith(".xls")) {
 				    	 excelFile = new File(excelFile.getAbsolutePath()+".xls");
 				    }
-		            //FileOutputStream out = 
-		                    //new FileOutputStream(new File("C:\\Users\\Candice\\Documents\\testQuantique.xls"));
 		            FileOutputStream out = 
 		                    new FileOutputStream(excelFile);
 		            workbook.write(out);
@@ -131,7 +129,7 @@ public class Benchmark {
         cptEve = (cptEve*100) / size_max;
         cptKey = (cptKey*100) / size_max;
         Cell cell = firstLine.createCell(7);
-        cellStyle.setDataFormat(workbook.createDataFormat().getFormat("0%"));
+        //cellStyle.setDataFormat(workbook.createDataFormat().getFormat("0%"));
         cell.setCellStyle(cellStyle);
         cell.setCellValue(cptEve);
         cell = firstLine.createCell(8);
