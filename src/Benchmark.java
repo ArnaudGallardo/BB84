@@ -24,11 +24,11 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-//		write(100, 2, workbook);
-//		write(100, 3, workbook);
-//		write(100, 4, workbook);
-//		write(100, 5, workbook);
-		write2n(21, workbook);
+		write(100, 2, workbook);
+		write(100, 3, workbook);
+		write(100, 4, workbook);
+		write(100, 5, workbook);
+//		write2n(21, workbook);
 		
 
 		try {
@@ -143,7 +143,7 @@ public class Benchmark {
 	
 	public static int[] compute(int keySizeMax, int lvl)
 	{
-		int result[] = new int[6];
+		int result[] = new int[7];
 		result[0] = keySizeMax; // Number of characters we want to encrypt
 		
 		
@@ -170,7 +170,6 @@ public class Benchmark {
 		result[3] = bobFilters.numberIden(aliceFilters); // Number of photons correctly read by Bob
 		
 		int nbSacrificed = result[3] / 2; // Number of photons to sacrifice to obtain a proper key
-		
 		result[4] = nbSacrificed;
 
 		int[] comparison = bobKey.arrayWithDiscards(aliceFilters, bobFilters); // Creation of an array containing Bob's bit measurement
@@ -181,7 +180,15 @@ public class Benchmark {
 		else
 			result[5] = 0;
 		
-		if(result[3] - nbSacrificed < keySizeMax * 8 && result[5] == 1)
+		int bitsEve = 0; // Counter of Bob's bit measurement that has been changed because of Eve
+		// Loop that will count the number of sacrificed bits that helped detect Eve
+		for(int i = 0; i < comparison.length; i++)
+		{
+			if(comparison[i] == -2)
+				bitsEve++;
+		}
+		
+		if(bitsEve > (result[0] * 8) / 2) // If the number of sacrificed bits modified by Eve is superior to the third of sacrificed bits
 			result[6] = 0;
 		else
 			result[6] = 1;
