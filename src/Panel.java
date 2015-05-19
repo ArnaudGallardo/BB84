@@ -32,6 +32,7 @@ public class Panel extends JPanel {
 	
 	
 	public void paintComponent(Graphics g){
+		// Initializes the images
 		Image fiber = null;
 		Image p0 = null;
 		Image p1 = null;
@@ -43,7 +44,8 @@ public class Panel extends JPanel {
 		Image data = null;
 		Image d0 = null;
 		Image d1 = null;
-		//Load images
+		
+		// Loads the images 
 		try {
 			fiber = ImageIO.read(new File("img/fiber.png"));
 			p0 = ImageIO.read(new File("img/vertical.png"));
@@ -59,10 +61,11 @@ public class Panel extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//Clear panel
+		// Clear panel
 		g.setColor(Color.white);
 	    g.fillRect(0, 0, this.getWidth(), this.getHeight());
-	    //Draw Menu
+	    
+	    // Draw Menu
 	    int menu_size = 100;
 	    g.setColor(new Color(0,158,224));
 	    g.fillRect(0, 0, this.getWidth(), menu_size);
@@ -79,10 +82,10 @@ public class Panel extends JPanel {
 		g.drawImage(fiber, (this.getWidth()-623)/2, (height-110)/2+menu_size, this);
 		g.drawImage(data, (this.getWidth()-623)/2, ((height/3)/2)-(110/2)+(2*height/3)+menu_size, this);
 		
-		//Draw animation photon
+		// Draws photon animation
 		int x;
 		int y = ((height-110)/2)+147;
-		if(directionPhotonFlux) {
+		if(directionPhotonFlux) { // From Alice to Bob
 			for(int i=0;i<sizePhotonFlux;i++) {
 				x=((this.getWidth()-600)/2)+60*(sizePhotonFlux-i)-60;
 				x+=this.getAnimPhotonFlux();
@@ -96,8 +99,8 @@ public class Panel extends JPanel {
 					g.drawImage(p3,x, y ,56,56, this);
 			}
 		}
-		else {
-			for(int i=sizePhotonFlux-1;i>=0;i--) {
+		else { 
+			for(int i=sizePhotonFlux-1;i>=0;i--) { // From Bob to Alice
 				x=((this.getWidth()-600)/2)+60*(11-sizePhotonFlux+i)-60;
 				x-=this.getAnimPhotonFlux();
 				if(photonFlux[i]==0)
@@ -110,10 +113,11 @@ public class Panel extends JPanel {
 					g.drawImage(p3,x, y ,56,56, this);
 			}
 		}
-		//Draw anim mails
+		
+		// Draws mails animation
 		y = ((height/3)/2)-(110/2)+147;
 		if(directionMailFlux) {
-			for(int i=0;i<sizeMailFlux;i++) {
+			for(int i=0;i<sizeMailFlux;i++) { // From Alice to Bob
 				x=((this.getWidth()-600)/2)+60*(sizeMailFlux-i)-60;
 				x+=this.getAnimMailFlux();
 				if(mailFlux[i]==0)
@@ -123,7 +127,7 @@ public class Panel extends JPanel {
 			}
 		}
 		else {
-			for(int i=sizeMailFlux-1;i>=0;i--) {
+			for(int i=sizeMailFlux-1;i>=0;i--) { // From Bob to Alice
 				x=((this.getWidth()-600)/2)+60*(11-sizeMailFlux+i)-60;
 				x-=this.getAnimMailFlux();
 				if(mailFlux[i]==0)
@@ -132,7 +136,8 @@ public class Panel extends JPanel {
 					g.drawImage(m1,x, y ,56,56, this);
 			}
 		}
-		//Draw anim data
+		
+		// Draws data animation
 		y = ((height/3)/2)-(110/2)+(2*height/3)+147;
 		if(directionDataFlux) {
 			for(int i=0;i<sizeDataFlux;i++) {
@@ -155,14 +160,14 @@ public class Panel extends JPanel {
 			}
 		}
 		
-		//Draw connected
+		// Draws the status of the clients (connected or not)
 	    g.drawString("Alice", 50, 75);
 	    g.drawString("Eve", (this.getWidth()/2)-25, 75);
 	    g.drawString("Bob", this.getWidth()-50, 75);
 		if(isCoAlice)
-			g.setColor(Color.green);
+			g.setColor(Color.green); // Connected
 		else
-			g.setColor(Color.red);
+			g.setColor(Color.red); // Disconnected
 		g.fillOval(25, 60, 15, 15);
 		if(isCoBob)
 			g.setColor(Color.green);
@@ -175,7 +180,7 @@ public class Panel extends JPanel {
 			g.setColor(Color.red);
 	    g.fillOval((this.getWidth()/2)-45, 60, 15, 15);
 	    
-	    //Signature
+	    // Signature
 	    Font fontSign = new Font("Lato",Font.BOLD,15);
 	    g.setFont(fontSign);
 		g.setColor(Color.black);
@@ -239,6 +244,7 @@ public class Panel extends JPanel {
 		return this.animPhotonFlux;
 	}
 	
+	// Adds a photon to the animation
 	public void addPhoton(Photon p) {
 		System.out.println(this.getSizePhotonFlux()+" | "+p);
 		Polarization po = p.getPolarization();
@@ -260,11 +266,11 @@ public class Panel extends JPanel {
 			this.setSizePhotonFlux(this.getSizePhotonFlux()+1);
 	}
 	
+	// "Removes" a photon from the animation
 	public void clearPhoton() {
 		setSizePhotonFlux(0);
 	}
 
-	
 	public void setMailFlux(int i, int v) {
 		this.mailFlux[i] = v;
 	}
@@ -297,12 +303,13 @@ public class Panel extends JPanel {
 		return this.animMailFlux;
 	}
 	
+	// Adds a mail to the animation
 	public void addMail(Filter f) {
 		System.out.println(this.getSizeMailFlux()+" | "+f);
 		
-		if(f.getBasis()==Basis.ORTHOGONAL)
+		if(f.getBasis()==Basis.ORTHOGONAL) // "+" mail
 			this.setMailFlux(getSizeMailFlux(), 0);
-		else 
+		else // "x" mail
 			this.setMailFlux(getSizeMailFlux(), 1);
 		
 		if(getSizeMailFlux()>=9) {
@@ -314,6 +321,7 @@ public class Panel extends JPanel {
 			this.setSizeMailFlux(this.getSizeMailFlux()+1);
 	}
 	
+	// "Removes" a mail from the animation
 	public void clearMail() {
 		setSizeMailFlux(0);
 	}
@@ -350,12 +358,13 @@ public class Panel extends JPanel {
 		return this.animDataFlux;
 	}
 	
+	// Adds data to the animation
 	public void addData(byte b) {
 		System.out.println(this.getSizeDataFlux()+" | "+b);
 		
-		if(b==0)
+		if(b==0) // Data = 0
 			this.setDataFlux(getSizeDataFlux(), 0);
-		else 
+		else // Data = 1
 			this.setDataFlux(getSizeDataFlux(), 1);
 		
 		if(getSizeDataFlux()>=9) {
@@ -367,6 +376,7 @@ public class Panel extends JPanel {
 			this.setSizeDataFlux(this.getSizeDataFlux()+1);
 	}
 	
+	// "Removes" data from the animation
 	public void clearData() {
 		setSizeDataFlux(0);
 	}
