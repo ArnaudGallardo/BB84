@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Row;
 
 
 public class BenchmarkGraph extends Benchmark {
+	// Create a block a cells that can directly be used to create a graph
 	public static void writeGraph(HSSFWorkbook workbook) {
 				
 	    HSSFSheet sheet = workbook.createSheet("Graphs");
@@ -39,8 +40,5 @@ public class BenchmarkGraph extends Benchmark {
         	cell.setCellFormula("'Max characters=100;security="+s2[i]+"'!H1");
         	
         }
-        
-        
-        
 	}
 }
