@@ -15,20 +15,21 @@ public class ServerCore {
 	}
 	
 	public void launchSystem() {
-		System.out.println("Waiting for Alice, Bob and Eve.");
+		System.out.println("Waiting for Alice, Bob and Eve."); 
 		int tmp = 0;
-		while(peopleConnected<3) {
+		while(peopleConnected<3) { // Waits for everyone to be connected
 			System.out.println(peopleConnected);
 			if(peopleConnected!=tmp) {
-				if(peopleConnected==1)
+				if(peopleConnected==1)	// Connects Alice in the first place
 					System.out.println("Waiting for Bob and Eve");
-				if(peopleConnected==2)
+				if(peopleConnected==2)	// Then Bob
 					System.out.println("Waiting for Eve");
-				tmp=peopleConnected;
+				tmp=peopleConnected;	// Then Eve
 			}
 		}
 		System.out.println("Everyone is connected!");
-		System.out.println("Ask Alice for message:");
+		
+		System.out.println("Ask Alice for message:"); // Once everyone's connected, Alice needs to send her message
 		askForMessage(getConnectedIp(0));
 		while(this.message.equals("")) {
 			try {
@@ -37,11 +38,11 @@ public class ServerCore {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("Waiting for a response...");
+			System.out.println("Waiting for a response..."); // Waits for Alice's message
 		}
 		System.out.println("Message is: "+this.message);
 		
-		System.out.println("Ask Eve for spying:");
+		System.out.println("Ask Eve for spying:"); // Does Eve want to spy?
 		askForSpying(getConnectedIp(2),false);
 		
 		while(this.spying.equals("")) {
@@ -51,37 +52,25 @@ public class ServerCore {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("Waiting for a response...");
+			System.out.println("Waiting for a response..."); // Waits for Eve's wish to spy
 		}
-		System.out.println("Response is: "+this.spying); //y or n
+		System.out.println("Response is: "+this.spying); // Yes (y) or No (n) (no other answer accepted)
 		
-		//CONTINUER ICI
-		//Besoin des r�glages, puis sc�nario classique de cryptage + envoi des donn�es
-		boolean isSpying = this.spying.equals("y");
+		
+		boolean isSpying = this.spying.equals("y"); // True if Eve answered "y", false otherwise
 				
-		byte[] binMessage = Crypt.toBin(this.message);
+		byte[] binMessage = Crypt.toBin(this.message); // Transforms Alice's into binary digits
 		
-		//Si jamais, on utilise a nouveau 2^n
-		/*byte[][] binMessageTab = new byte[(binMessage.length/8)+1][8];
-		for(int i=0;i<(binMessage.length/8)+1;i++) {
-			for(int j=0;j<8;j++) {
-				if((i*8)+j<binMessage.length)
-					binMessageTab[i][j]=binMessage[(i*8)+j];
-			}
+		int oneTimePad = binMessage.length*2; // Number of photons that will be sent
 		
-		}*/
-		//int oneTimePad = (int) Math.pow(2, binMessageTab[0].length);
-		
-		int oneTimePad = binMessage.length*2;
-		
-		//Alice
+		// Alice
 		BytesScheme aliceKeyBin = new BytesScheme(oneTimePad);
 		FilterScheme aliceKeyFilt = new FilterScheme(oneTimePad);
 		PhotonScheme aliceKeyPhoton = new PhotonScheme(oneTimePad, aliceKeyBin, aliceKeyFilt);
 		sendMessage("Sending photons", connectedIp[0]);
 		Window.photonFluxAtoB(aliceKeyPhoton);
 		
-		//Eve
+		// Eve
 		if(isSpying) {
 			sendMessage("You are spying on the conversation!", connectedIp[2]);
 			FilterScheme eveHackFilter = new FilterScheme(oneTimePad);
@@ -89,31 +78,25 @@ public class ServerCore {
 			BytesScheme eveHackBin = new BytesScheme(oneTimePad, aliceKeyPhoton, eveHackFilter);
 		}
 		
-		//Bob
+		// Bob
 		sendMessage("Receiving photons from Alice...", connectedIp[1]);
 		FilterScheme bobKeyFilt = new FilterScheme(oneTimePad);
 		sendMessage("Photons received", connectedIp[1]);
 		BytesScheme bobKeyBin = new BytesScheme(oneTimePad, aliceKeyPhoton, bobKeyFilt);
 		sendMessage("Sending filters list to Alice", connectedIp[1]);
-		//Mails
+		// Mails
 		Window.mailFluxBtoA(bobKeyFilt);
 		sendMessage("Receiving filters list from Bob...", connectedIp[0]);
 		
-		//BytesScheme eveFinalKey = eveHackBin.getFinalKey(aliceKeyFilt, eveHackFilter);
-		//Que faire d'Eve ??
-//		int percentOfKey = 20; 
+		// Sacrificing bits to detect Eve
 		int[] indexId = bobKeyFilt.indexOfIden(aliceKeyFilt);
-//		boolean detected = aliceKeyBin.eveDetected(bobKeyBin, indexId, percentOfKey);
-		
-		// Les trois lignes ci-dessous permettent de remplacer la fonction eveDectected (supprime si tu trouves inutile :p)
 		int nbSacrificed = oneTimePad - binMessage.length;
 		int[] comparison = bobKeyBin.arrayWithDiscards(aliceKeyFilt, bobKeyFilt);
 		boolean detected = aliceKeyBin.detection(comparison, nbSacrificed);
 		
-		//Mettre en commun finalKey et detection
 		BytesScheme aliceFinalKey = aliceKeyBin.getFinalKey(aliceKeyFilt, bobKeyFilt);
 		
-		
+		// If Eve isn't detected, the message is sent
 		if(!detected) {
 			sendMessage("Encrypting message...", connectedIp[0]);
 			byte[] cryptedMessage = Crypt.encrypt(binMessage, aliceFinalKey.cleanKeyWithIndex(indexId));
@@ -130,23 +113,26 @@ public class ServerCore {
 			System.out.println(bobMessage);
 			sendMessage("Bob received the message", connectedIp[0]);
 		}
+		// Otherwise, the message isn't sent 
 		else {
 			sendAllMessage("Eve has been detected!");
 			System.out.println("Detected!!");
 		}
 		
-		sendAllMessage("================================");
+		sendAllMessage("================================"); // Separation line between two "sessions"
 		
 		this.message = "";
 		this.spying = "";
 		launchSystem();
 	}
 
+	// Sends a message on a client's shell
 	private void sendMessage(String message, ServerConnection conn) {
 		String tmp = "i" + message;
 		conn.send(tmp.getBytes(), Delivery.RELIABLE);
 	}
 	
+	// Sends a message on all of the clients' shells
 	private void sendAllMessage(String message) {
 		String tmp = "i" + message;
 		for(int i=0;i<this.peopleConnected;i++) {
@@ -154,18 +140,21 @@ public class ServerCore {
 		}
 	}
 	
+	// Asks Alice for her message
 	public static void askForMessage(ServerConnection conn) {
 		String str = new String("o"+"m"+"What is your message:");
 		conn.send(str.getBytes(), Delivery.RELIABLE);
 	}
 
+	// Asks Eve if she wants to spy or not
 	public static void askForSpying(ServerConnection conn,boolean error) {
 		String str = new String("o"+"s"+"Do you want to spy (y/n):");
 		if(error)
 			str = str + " Wrong awnser, try again: ";
 		conn.send(str.getBytes(), Delivery.RELIABLE);
 	}
-
+ 
+	
 	public void incPeopleConnected() {
 		this.peopleConnected++;
 	}
