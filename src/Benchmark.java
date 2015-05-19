@@ -10,6 +10,8 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 
+import java.util.*;
+
 /* 
  * Notes :
  * 			1st colum: Length of the original message
@@ -24,11 +26,11 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		write(100, 2, workbook);
-		write(100, 3, workbook);
-		write(100, 4, workbook);
-		write(100, 5, workbook);
-//		write2n(21, workbook);
+//		write(100, 2, workbook);
+//		write(100, 3, workbook);
+//		write(100, 4, workbook);
+//		write(100, 5, workbook);
+		write2n(21, workbook);
 		
 
 		try {
@@ -197,6 +199,7 @@ public class Benchmark {
 
 	public static void write2n(int size_max, HSSFWorkbook workbook)
 	{
+		long time = System.currentTimeMillis();
 		StringBuffer name = new StringBuffer();
 		name.append("Max characters=");
 		name.append(size_max);
@@ -229,7 +232,7 @@ public class Benchmark {
         	int cpt = 0; // Counter of times Eve has been detected
         	for(int j = 0; j < 100; j++)
         	{
-        		System.out.println("Nombre de caractères : " + i + " - Test : " + j);
+        		System.out.println("Nombre de caractères : " + i + " - Test : " + (j+1));
         		result = computeVernam(i);
         		if(result[5] == 1)
         			cpt++;	
@@ -247,10 +250,8 @@ public class Benchmark {
             		cell.setCellValue(cpt);
             }
         }
-                
-        // cell.setValue(0.123); CellStyle style = workbook.createStyle();
-        //style.setDataFormat(wb.createDataFormat().getFormat("0.000%")):
         
+        System.out.println("Temps d'execution: " + (((System.currentTimeMillis() - time) / 1000) / 60) + " minutes");        
         System.out.println("Page done.");
 	}
 	
