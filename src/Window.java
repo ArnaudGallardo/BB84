@@ -20,6 +20,10 @@ public class Window extends JFrame {
 	}    
 	
 	public static void photonFluxAtoB(PhotonScheme ps) {
+		if(ps.getSize()<=2)
+			WAIT=5;
+		else
+			WAIT=2;
 		for(int i=0;i<ps.getSize();i++) {
 			pan.addPhoton(ps.getPhoton(i));
 			pan.repaint();
@@ -45,6 +49,10 @@ public class Window extends JFrame {
 	}
 		
 	public static void mailFluxAtoB(FilterScheme fs) {
+		if(fs.getSize()<=2)
+			WAIT=5;
+		else
+			WAIT=2;
 		for(int i=0;i<fs.getSize();i++) {
 			pan.addMail(fs.getFilter(i));
 			pan.repaint();
@@ -70,6 +78,10 @@ public class Window extends JFrame {
 	}
 	
 	public static void dataFluxAtoB(BytesScheme bs) {
+		if(bs.getSize()<=2)
+			WAIT=5;
+		else
+			WAIT=2;
 		for(int i=0;i<bs.getSize();i++) {
 			pan.addData(bs.getByte(i));
 			pan.repaint();
