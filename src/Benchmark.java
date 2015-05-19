@@ -18,15 +18,16 @@ import org.apache.poi.ss.usermodel.*;
  * 			4th column: Number of qBits correctly read by Bob
  * 			5th column: Number of sacrificed qBits
  * 			6th column: Eve detection
+ * 			7th column: Correct key
 */			
 
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		write(100, 2, workbook);
-		write(100, 3, workbook);
-		write(100, 4, workbook);
-		write(100, 5, workbook);
+//		write(100, 2, workbook);
+//		write(100, 3, workbook);
+//		write(100, 4, workbook);
+//		write(100, 5, workbook);
 		write2n(21, workbook);
 		
 
@@ -120,10 +121,11 @@ public class Benchmark {
                 
         // Adds a new row and then the Eve's detection rate
         cpt = (cpt*100) / size_max;
-        Row last_row = sheet.createRow(size_max+1); 
-        Cell cell = last_row.createCell(5);
+        // cell.setValue(0.123); CellStyle style = workbook.createStyle();
+        //style.setDataFormat(wb.createDataFormat().getFormat("0.000%")):
+        Cell cell = firstLine.createCell(7);
         cell.setCellStyle(cellStyle);
-        cell.setCellValue(cpt + "%");
+        cell.setCellValue(cpt);
         
         System.out.println("Page done.");
 	}
@@ -151,8 +153,8 @@ public class Benchmark {
         Row firstLine = sheet.createRow(0);
         
         String[] s = {"Length of the message", "Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
-        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection"};
-        for(int i = 0; i < 6; i++)
+        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection", "Correct key?"};
+        for(int i = 0; i < 7; i++)
         {
         	Cell cell = firstLine.createCell(i);   	
         	cell.setCellValue(s[i]);
@@ -174,17 +176,19 @@ public class Benchmark {
 
         // Adds a new row and then the Eve's detection rate
         cpt = (cpt*100) / size_max;
-        Row last_row = sheet.createRow(size_max+1); 
-        Cell cell = last_row.createCell(5);
+        // cell.setValue(0.123); CellStyle style = workbook.createStyle();
+        //style.setDataFormat(wb.createDataFormat().getFormat("0.000%")):
+        //Row last_row = sheet.createRow(size_max+1); 
+        Cell cell = firstLine.createCell(7);
         cell.setCellStyle(cellStyle);
-        cell.setCellValue(cpt + "%");
+        cell.setCellValue(cpt);
                 
         System.out.println("Page done.");
 	}
 	
 	public static int[] compute(int keySizeMax, int lvl)
 	{
-		int result[] = new int[6];
+		int result[] = new int[7];
 		result[0] = keySizeMax; // Number of characters we want to encrypt
 		
 		
@@ -214,11 +218,14 @@ public class Benchmark {
 		
 		if(nbSacrificed <= 0) // If there's not bit to sacrifice
 		{
-			result[4] = 0; // We don't
-			result[5] = 0; // Eve is not detected
+			result[4] = 1; // We sacrifice one qBit
+			result[6] = 0;
 		}
 		else
+		{
 			result[4] = nbSacrificed;
+			result[6] = 1;
+		}
 
 		int[] comparison = bobKey.arrayWithDiscards(aliceFilters, bobFilters); // Creation of an array containing Bob's bit measurement
 		// that Alice has validated, -1 otherwise
@@ -236,7 +243,7 @@ public class Benchmark {
 	// Make statistics using a message containing from 1*8 to keySizeMax*8 (1 characters = 8 bytes) characters with the creation of 2^n photons, n being the number of characters
 	public static int[] computeVernam(int keySizeMax)
 	{
-		int[] result = new int[6]; // Initialization of the array containing the results
+		int[] result = new int[7]; // Initialization of the array containing the results
 		result[0] = keySizeMax;
 		
 		//int qBitsEve = 0; // Initialization of the qBits number Eve reads properly
@@ -308,11 +315,14 @@ public class Benchmark {
 		int nbSacrificed = numberIden - (keySizeMax * 8); // Number of photons that must be sacrificed to obtain a correct key
 		
 		if(nbSacrificed > 0)
-			result[4] = nbSacrificed;
-		else
 		{
-			result[4] = 0;
-			result[5] = 0;
+			result[4] = nbSacrificed;
+			result[6] = 1;
+		}
+		else // If there is normaly no photon to sacrifice
+		{
+			result[4] = 1;
+			result[6] = 0;
 		}
 		
 		boolean detected = false;
