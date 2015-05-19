@@ -98,7 +98,7 @@ public class Benchmark {
         Row firstLine = sheet.createRow(0);
         
         String[] s = {"Length of the message", "Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
-        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection"};
+        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection", "Correct key?"};
         for(int i = 0; i < 6; i++)
         {
         	Cell cell = firstLine.createCell(i);   	
