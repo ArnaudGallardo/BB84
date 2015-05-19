@@ -135,6 +135,7 @@ public class ServerCore {
 			System.out.println("Detected!!");
 		}
 		
+		sendAllMessage("================================");
 		
 		this.message = "";
 		this.spying = "";
