@@ -20,7 +20,7 @@ public class Window extends JFrame {
 	}    
 	
 	public static void photonFluxAtoB(PhotonScheme ps) {
-		if(ps.getSize()<=2)
+		if(ps.getSize()<=16)
 			WAIT=5;
 		else
 			WAIT=2;
@@ -49,7 +49,7 @@ public class Window extends JFrame {
 	}
 		
 	public static void mailFluxAtoB(FilterScheme fs) {
-		if(fs.getSize()<=2)
+		if(fs.getSize()<=16)
 			WAIT=5;
 		else
 			WAIT=2;
@@ -78,7 +78,7 @@ public class Window extends JFrame {
 	}
 	
 	public static void dataFluxAtoB(BytesScheme bs) {
-		if(bs.getSize()<=2)
+		if(bs.getSize()<=16)
 			WAIT=5;
 		else
 			WAIT=2;
