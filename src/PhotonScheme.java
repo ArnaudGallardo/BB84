@@ -2,6 +2,7 @@
 public class PhotonScheme extends AbstractScheme{
 	private Photon[] photons;
 	
+	// Given a bit value and a filter, returns a new correctly polarized photon
 	private static Photon polarize(byte b, Filter f) {
 		Photon tmp = new Photon();
 		if(b==0) {
