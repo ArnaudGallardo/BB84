@@ -103,29 +103,7 @@ public class BytesScheme extends AbstractScheme{
 		tmp.append(this.getByte(this.getSize()-1));
 		return tmp.toString();
 	}
-	
-	
-//	//A MODIFIER, bs == index donc ...
-//	public boolean eveDetected(BytesScheme bs,int[] index,int percentOfKey) {
-//		int nbOfVerification = (percentOfKey*index.length)/100;
-//		int[] checked = new int[nbOfVerification];
-//		if(nbOfVerification<index.length) {
-//			for(int i=0;i<nbOfVerification;i++) {
-//				int random = (int)(Math.random()*index.length);
-//				while(isInArray(random,checked)) {
-//					random = (int)(Math.random()*index.length);
-//				}
-//				checked[i] = random;
-//				int tmp = index[random];
-//				index[random] = -1; //ATTENTION
-//				if(this.getByte(tmp)!=bs.getByte(tmp))
-//					return true;
-//			}
-//			return false;
-//		}
-//		return true;
-//	}
-	
+		
 	
 	// The object this method applies to is Alice's original bit key
 	// Given an array of Bob's bit measurement with the 
