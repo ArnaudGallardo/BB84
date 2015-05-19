@@ -106,8 +106,11 @@ public class Benchmark {
             sheet.autoSizeColumn(i);
         }
         
+        int cpt = 0; // Counter of times Eve has been detected
         for(int i = 1; i <= size_max; i++) {
         	result = computeVernam(i);
+        	if(result[5] == 1)
+        		cpt++;
             Row row = sheet.createRow(i);
         	for(int j = 0; j < result.length; j++) {
         		Cell cell = row.createCell(j);
@@ -115,6 +118,13 @@ public class Benchmark {
         	}
         }
                 
+        // Adds a new row and then the Eve's detection rate
+        cpt = (cpt*100) / size_max;
+        Row last_row = sheet.createRow(size_max+1); 
+        Cell cell = last_row.createCell(5);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(cpt + "%");
+        
         System.out.println("Page done.");
 	}
 	
@@ -150,14 +160,24 @@ public class Benchmark {
             sheet.autoSizeColumn(i);
         }
         
+        int cpt = 0; // Counter of times Eve has been detected
         for(int i = 1; i <= size_max; i++) {
         	result = compute(i, lvl);
+        	if(result[5] == 1)
+        		cpt++;
             Row row = sheet.createRow(i);
         	for(int j = 0; j < result.length; j++) {
         		Cell cell = row.createCell(j);
                 cell.setCellValue(result[j]);
         	}
         }
+
+        // Adds a new row and then the Eve's detection rate
+        cpt = (cpt*100) / size_max;
+        Row last_row = sheet.createRow(size_max+1); 
+        Cell cell = last_row.createCell(5);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(cpt + "%");
                 
         System.out.println("Page done.");
 	}
