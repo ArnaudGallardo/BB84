@@ -12,6 +12,7 @@ public class QuantumConnectionListener implements ConnectionListener{
 		return sc;
 	}
 	
+	// Informs which connection has been lost (if one has)
 	public void connectionBroken(Connection broken, boolean forced){
 		sc.decPeopleConnected();
 		if(broken.toString()==sc.getConnectedIp(0).getIP()) {
@@ -34,6 +35,7 @@ public class QuantumConnectionListener implements ConnectionListener{
 		}
 	}
 	
+	// Receives message
 	public void receive(byte[] data, Connection from){
 		String msg = new String(data);
 		System.out.println("Received message: "+new String(data));
@@ -55,6 +57,7 @@ public class QuantumConnectionListener implements ConnectionListener{
 		from.send(new String("Recu\n").getBytes(), Delivery.RELIABLE);
 	}
 	
+	// Prints on the console who is connected and with which IP address
 	public void clientConnected(ServerConnection conn){
 		sc.incPeopleConnected();
 		if(!sc.getConnected(0)) {
