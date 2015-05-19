@@ -137,31 +137,35 @@ public class BytesScheme extends AbstractScheme{
 		int cpt = 0; // Counter of sacrificed photons (= verifications)
 		boolean detected = false; // Is Eve detected?
 		
-		while(nbSacrificed > 0 && cpt <= nbSacrificed && !detected && stillContainsBits(arrayWithDiscards))
+		while(nbSacrificed > 0 && cpt <= nbSacrificed && stillContainsBits(arrayWithDiscards))
 		{
 			int i = (int) (Math.random() * arrayWithDiscards.length); // Generates a random index in arrayWithDiscards
-			while(arrayWithDiscards[i] == -1) // While -1, that's to say while the randomly generated 
+			while(arrayWithDiscards[i] == -1 || arrayWithDiscards[i] == -2) // While -1, that's to say while the randomly generated 
 				// index corresponds to an already discarded bit measurement (during the filter exchange or later)
 			{
 				i = (int) (Math.random() * arrayWithDiscards.length);
 			}
 			
-			if(arrayWithDiscards[i] == this.getByte(i))
+			if(arrayWithDiscards[i] == this.getByte(i)) // If Bob's bit measurement corresponds to Alice's
 			{
 				cpt++;
 				arrayWithDiscards[i] = -1;
 			}
-			else 
+			else // Otherwise
+			{
+				arrayWithDiscards[i] = -2;
 				detected = true;
+			}
 		}
 		return detected;
 	}
 	
-	public static boolean stillContainsBits(int[] arrayWithDiscards)
+	// Given an array of int, determine if some bits measurement are remaining
+	private static boolean stillContainsBits(int[] arrayWithDiscards)
 	{
 		for(int i = 0; i < arrayWithDiscards.length; i++)
 		{
-			if(arrayWithDiscards[i] != -1)
+			if(arrayWithDiscards[i] != -1 && arrayWithDiscards[i] != -2) // If != -1 && != -2, it means that it contains bit measurements
 				return true;
 		}
 		return false;
