@@ -78,57 +78,7 @@ public class Benchmark {
 	}
 	
 	
-	public static void write2n(int size_max, HSSFWorkbook workbook)
-	{
-		StringBuffer name = new StringBuffer();
-		name.append("Max characters=");
-		name.append(size_max);
-		name.append(";security level=2^n");		
-		
-	    HSSFSheet sheet = workbook.createSheet(name.toString());
-	    int[] result;
-        
-	    // Cell style
-        HSSFCellStyle cellStyle = null; // Initialization of cell style
-        HSSFFont font = workbook.createFont(); // Creation of the font (to modify its appearence later)
-        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Bold
-        cellStyle = workbook.createCellStyle(); // Creation of the cell style
-        cellStyle.setFont(font); // Application of the cell style
-        
-        Row firstLine = sheet.createRow(0);
-        
-        String[] s = {"Length of the message", "Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
-        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection", "Correct key?"};
-        for(int i = 0; i < 6; i++)
-        {
-        	Cell cell = firstLine.createCell(i);   	
-        	cell.setCellValue(s[i]);
-            cell.setCellStyle(cellStyle);
-            sheet.autoSizeColumn(i);
-        }
-        
-        int cpt = 0; // Counter of times Eve has been detected
-        for(int i = 1; i <= size_max; i++) {
-        	result = computeVernam(i);
-        	if(result[5] == 1)
-        		cpt++;
-            Row row = sheet.createRow(i);
-        	for(int j = 0; j < result.length; j++) {
-        		Cell cell = row.createCell(j);
-                cell.setCellValue(result[j]);
-        	}
-        }
-                
-        // Adds a new row and then the Eve's detection rate
-        cpt = (cpt*100) / size_max;
-        // cell.setValue(0.123); CellStyle style = workbook.createStyle();
-        //style.setDataFormat(wb.createDataFormat().getFormat("0.000%")):
-        Cell cell = firstLine.createCell(7);
-        cell.setCellStyle(cellStyle);
-        cell.setCellValue(cpt);
-        
-        System.out.println("Page done.");
-	}
+	
 	
 	public static void write(int size_max, int lvl, HSSFWorkbook workbook)
 	{
@@ -162,11 +112,14 @@ public class Benchmark {
             sheet.autoSizeColumn(i);
         }
         
-        int cpt = 0; // Counter of times Eve has been detected
+        int cptEve = 0; // Counter of times Eve has been detected
+        int cptKey = 0; // Counter of times the key is correct
         for(int i = 1; i <= size_max; i++) {
         	result = compute(i, lvl);
         	if(result[5] == 1)
-        		cpt++;
+        		cptEve++;
+        	if(result[6] == 1)
+        		cptKey++;
             Row row = sheet.createRow(i);
         	for(int j = 0; j < result.length; j++) {
         		Cell cell = row.createCell(j);
@@ -174,21 +127,23 @@ public class Benchmark {
         	}
         }
 
-        // Adds a new row and then the Eve's detection rate
-        cpt = (cpt*100) / size_max;
-        // cell.setValue(0.123); CellStyle style = workbook.createStyle();
-        //style.setDataFormat(wb.createDataFormat().getFormat("0.000%")):
-        //Row last_row = sheet.createRow(size_max+1); 
+        // Adds Eve's detection rate and the correct key rate 
+        cptEve = (cptEve*100) / size_max;
+        cptKey = (cptKey*100) / size_max;
         Cell cell = firstLine.createCell(7);
+        cellStyle.setDataFormat(workbook.createDataFormat().getFormat("0%"));
         cell.setCellStyle(cellStyle);
-        cell.setCellValue(cpt);
+        cell.setCellValue(cptEve);
+        cell = firstLine.createCell(8);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(cptKey);
                 
         System.out.println("Page done.");
 	}
 	
 	public static int[] compute(int keySizeMax, int lvl)
 	{
-		int result[] = new int[7];
+		int result[] = new int[6];
 		result[0] = keySizeMax; // Number of characters we want to encrypt
 		
 		
@@ -214,18 +169,9 @@ public class Benchmark {
 		BytesScheme bobKey = new BytesScheme(oneTimePad, alicePhotons, bobFilters);
 		result[3] = bobFilters.numberIden(aliceFilters); // Number of photons correctly read by Bob
 		
-		int nbSacrificed = result[3] - (keySizeMax * 8); // Number of photons to sacrifice to obtain a proper key
+		int nbSacrificed = result[3] / 2; // Number of photons to sacrifice to obtain a proper key
 		
-		if(nbSacrificed <= 0) // If there's not bit to sacrifice
-		{
-			result[4] = 1; // We sacrifice one qBit
-			result[6] = 0;
-		}
-		else
-		{
-			result[4] = nbSacrificed;
-			result[6] = 1;
-		}
+		result[4] = nbSacrificed;
 
 		int[] comparison = bobKey.arrayWithDiscards(aliceFilters, bobFilters); // Creation of an array containing Bob's bit measurement
 		// that Alice has validated, -1 otherwise
@@ -235,10 +181,73 @@ public class Benchmark {
 		else
 			result[5] = 0;
 		
+		if(result[3] - nbSacrificed < keySizeMax * 8 && result[5] == 1)
+			result[6] = 0;
+		else
+			result[6] = 1;
+		
 		return result;
 	}
 
 
+	public static void write2n(int size_max, HSSFWorkbook workbook)
+	{
+		StringBuffer name = new StringBuffer();
+		name.append("Max characters=");
+		name.append(size_max);
+		name.append(";security=2^n");		
+		
+	    HSSFSheet sheet = workbook.createSheet(name.toString());
+	    int[] result;
+        
+	    // Cell style
+        HSSFCellStyle cellStyle = null; // Initialization of cell style
+        HSSFFont font = workbook.createFont(); // Creation of the font (to modify its appearence later)
+        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD); // Bold
+        cellStyle = workbook.createCellStyle(); // Creation of the cell style
+        cellStyle.setFont(font); // Application of the cell style
+        
+        Row firstLine = sheet.createRow(0);
+        
+        String[] s = {"Length of the message", "Number of Qbits sent by Alice", "Eve's detection (for 100 tests)"};
+        for(int i = 0; i < 3; i++)
+        {
+        	Cell cell = firstLine.createCell(i);   	
+        	cell.setCellValue(s[i]);
+            cell.setCellStyle(cellStyle);
+            sheet.autoSizeColumn(i);
+        }
+        
+        
+        for(int i = 1; i <= size_max; i++) 
+        {
+        	int cpt = 0; // Counter of times Eve has been detected
+        	for(int j = 0; j < 100; j++)
+        	{
+        		System.out.println("Nombre de caractères : " + i + " - Test : " + j);
+        		result = computeVernam(i);
+        		if(result[5] == 1)
+        			cpt++;	
+        	}
+            Row row = sheet.createRow(i);
+            
+            for(int k = 0; k < 3; k++)
+            {
+            	Cell cell = row.createCell(k);
+            	if(k == 0)
+            		cell.setCellValue(i);
+            	else if(k == 1)
+            		cell.setCellValue((int) (Math.pow(2, i)) * 8);
+            	else
+            		cell.setCellValue(cpt);
+            }
+        }
+                
+        // cell.setValue(0.123); CellStyle style = workbook.createStyle();
+        //style.setDataFormat(wb.createDataFormat().getFormat("0.000%")):
+        
+        System.out.println("Page done.");
+	}
 	
 	// Make statistics using a message containing from 1*8 to keySizeMax*8 (1 characters = 8 bytes) characters with the creation of 2^n photons, n being the number of characters
 	public static int[] computeVernam(int keySizeMax)
