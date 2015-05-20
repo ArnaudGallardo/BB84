@@ -27,6 +27,9 @@ public class ServerCore {
 				tmp=peopleConnected;	// Then Eve
 			}
 		}
+		sendMessage("========= ALICE =========",connectedIp[0]);
+		sendMessage("========= BOB =========",connectedIp[1]);
+		sendMessage("========= EVE =========",connectedIp[2]);
 		System.out.println("Everyone is connected!");
 		
 		System.out.println("Ask Alice for message:"); // Once everyone's connected, Alice needs to send her message
