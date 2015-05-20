@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
+		write(100, 1, workbook);
 		write(100, 2, workbook);
 		write(100, 3, workbook);
 		write(100, 4, workbook);
