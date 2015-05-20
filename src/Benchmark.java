@@ -10,8 +10,6 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 
-import java.util.*;
-
 /* 
  * Notes :
  * 			1st colum: Length of the original message
@@ -30,6 +28,7 @@ public class Benchmark {
 		write(100, 3, workbook);
 		write(100, 4, workbook);
 		write(100, 5, workbook);
+		BenchmarkGraph.writeGraph(workbook);
 //		write2n(21, workbook);
 		
 
