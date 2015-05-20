@@ -21,8 +21,8 @@ public class BenchmarkGraph extends Benchmark {
         
         Row firstLine = sheet.createRow(0);
         
-        String[] s = {"Security Level", "Detection rate", "Usable key rate"};
-        for(int i = 0; i < 3; i++)
+        String[] s = {"Security Level", "Detection rate"};
+        for(int i = 0; i < 2; i++)
         {
         	Cell cell = firstLine.createCell(i);   	
         	cell.setCellValue(s[i]);
@@ -30,8 +30,8 @@ public class BenchmarkGraph extends Benchmark {
             sheet.autoSizeColumn(i);
         }
         
-        String[] s2 = {"2n", "3n", "4n","5n"};
-        for(int i = 0; i < 4; i++)
+        String[] s2 = {"1n", "2n", "3n", "4n","5n"};
+        for(int i = 0; i < 5; i++)
         {
         	Row line = sheet.createRow(i+1);
         	Cell cell = line.createCell(0);   	
