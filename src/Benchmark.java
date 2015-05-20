@@ -26,11 +26,11 @@ import java.util.*;
 public class Benchmark {
 	public static void launch() {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-//		write(100, 2, workbook);
-//		write(100, 3, workbook);
-//		write(100, 4, workbook);
-//		write(100, 5, workbook);
-		write2n(21, workbook);
+		write(100, 2, workbook);
+		write(100, 3, workbook);
+		write(100, 4, workbook);
+		write(100, 5, workbook);
+//		write2n(21, workbook);
 		
 
 		try {
@@ -78,8 +78,6 @@ public class Benchmark {
 	}
 	
 	
-	
-	
 	public static void write(int size_max, int lvl, HSSFWorkbook workbook)
 	{
 		StringBuffer name = new StringBuffer();
@@ -103,8 +101,8 @@ public class Benchmark {
         Row firstLine = sheet.createRow(0);
         
         String[] s = {"Length of the message", "Number of Qbits sent by Alice", "Number of Qbits correctly read by Eve", 
-        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection", "Correct key?"};
-        for(int i = 0; i < 7; i++)
+        		"Number of Qbits correctly read by Bob", "Number of sacrificed photons", "Eve's detection"};
+        for(int i = 0; i < 6; i++)
         {
         	Cell cell = firstLine.createCell(i);   	
         	cell.setCellValue(s[i]);
@@ -113,13 +111,10 @@ public class Benchmark {
         }
         
         int cptEve = 0; // Counter of times Eve has been detected
-        int cptKey = 0; // Counter of times the key is correct
         for(int i = 1; i <= size_max; i++) {
         	result = compute(i, lvl);
         	if(result[5] == 1)
         		cptEve++;
-        	if(result[6] == 1)
-        		cptKey++;
             Row row = sheet.createRow(i);
         	for(int j = 0; j < result.length; j++) {
         		Cell cell = row.createCell(j);
@@ -129,21 +124,16 @@ public class Benchmark {
 
         // Adds Eve's detection rate and the correct key rate 
         cptEve = (cptEve*100) / size_max;
-        cptKey = (cptKey*100) / size_max;
         Cell cell = firstLine.createCell(7);
-        //cellStyle.setDataFormat(workbook.createDataFormat().getFormat("0%"));
         cell.setCellStyle(cellStyle);
         cell.setCellValue(cptEve);
-        cell = firstLine.createCell(8);
-        cell.setCellStyle(cellStyle);
-        cell.setCellValue(cptKey);
                 
         System.out.println("Page done.");
 	}
 	
 	public static int[] compute(int keySizeMax, int lvl)
 	{
-		int result[] = new int[7];
+		int result[] = new int[6];
 		result[0] = keySizeMax; // Number of characters we want to encrypt
 		
 		
@@ -169,8 +159,12 @@ public class Benchmark {
 		BytesScheme bobKey = new BytesScheme(oneTimePad, alicePhotons, bobFilters);
 		result[3] = bobFilters.numberIden(aliceFilters); // Number of photons correctly read by Bob
 		
-		int nbSacrificed = result[3] / 2; // Number of photons to sacrifice to obtain a proper key
-		result[4] = nbSacrificed;
+		int nbSacrificed = result[3] - (keySizeMax * 8);
+		if(nbSacrificed > 0)
+			result[4] = nbSacrificed;
+		else
+			result[4] = 1;
+				
 
 		int[] comparison = bobKey.arrayWithDiscards(aliceFilters, bobFilters); // Creation of an array containing Bob's bit measurement
 		// that Alice has validated, -1 otherwise
@@ -179,20 +173,7 @@ public class Benchmark {
 			result[5] = 1;
 		else
 			result[5] = 0;
-		
-		int bitsEve = 0; // Counter of Bob's bit measurement that has been changed because of Eve
-		// Loop that will count the number of sacrificed bits that helped detect Eve
-		for(int i = 0; i < comparison.length; i++)
-		{
-			if(comparison[i] == -2)
-				bitsEve++;
-		}
-		
-		if(bitsEve > (result[0] * 8) / 2) // If the number of sacrificed bits modified by Eve is superior to the third of sacrificed bits
-			result[6] = 0;
-		else
-			result[6] = 1;
-		
+			
 		return result;
 	}
 
@@ -334,7 +315,7 @@ public class Benchmark {
 			result[4] = nbSacrificed;
 			result[6] = 1;
 		}
-		else // If there is normaly no photon to sacrifice
+		else // If there is normally no photon to sacrifice
 		{
 			result[4] = 1;
 			result[6] = 0;
